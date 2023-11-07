@@ -1,0 +1,50 @@
+{
+  
+  "name": "therapist_api",
+  "version": "1.0.0",
+  "description": "A Node.js-based therapy app offers a secure and accessible platform for therapists and clients to manage therapy sessions and related activities. ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maurodev16/therapy_api.git"
+  },
+  "author": "Mauro Rodrigues da Silva",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maurodev16/therapy_api/issues"
+  },
+  "homepage": "https://github.com/maurodev16/therapy_api#readme",
+  "dependencies": {
+    "accounting": "^0.4.1",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "cloudinary": "^1.37.1",
+    "cor": "^0.0.0",
+    "cors": "^2.8.5",
+    "countries-list": "^2.6.1",
+    "country-state-city": "^3.2.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-async-errors": "^3.1.1",
+    "firebase": "^9.23.0",
+    "firebase-admin": "^11.10.1",
+    "handlebars": "^4.7.8",
+    "joi": "^17.10.1",
+    "jsonwebtoken": "^9.0.0",
+    "mime-types": "^2.1.35",
+    "moment": "^2.29.4",
+    "mongoose": "^7.5.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.5",
+    "socket.io": "^4.7.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
