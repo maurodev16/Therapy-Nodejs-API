@@ -1,13 +1,16 @@
 const mongoose = require("mongoose");
 const User = require("../models/userSchema");
-const Session = require("../models/sessionSchema");
 
 // Payment Schema
 const paymentSchema = new mongoose.Schema({
   client: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  session: { type: mongoose.Schema.Types.ObjectId, ref: "Session" },
   due_date: { type: Date },
-  payment_status: { type: String },
+  is_storned: { type: Boolean, default: false },
+  payment_status: {
+    type: String,
+    enum: ["open", "payed", "storned"],
+    default: "open",
+  },
   amount: { type: Number },
   payment_method: { type: String },
   transaction_number: { type: String },

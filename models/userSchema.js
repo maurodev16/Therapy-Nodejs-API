@@ -5,12 +5,11 @@ const bcryptSalt = process.env.BCRYPT_SALT;
 
 const userSchema = new mongoose.Schema(
   {
+    //client_number: { type: Number, required: true, unique: true },
     first_name: { type: String, required: true },
     last_name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ["admin", "client"], required: true },
-    is_admin: { type: Boolean },
   },
   {
     timestamps: true,
