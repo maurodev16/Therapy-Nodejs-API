@@ -1,22 +1,22 @@
 {
-  
   "name": "therapist_api",
   "version": "1.0.0",
   "description": "A Node.js-based therapy app offers a secure and accessible platform for therapists and clients to manage therapy sessions and related activities. ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ./index.js localhost 3001"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/maurodev16/therapy_api.git"
+    "url": "git+https://github.com/maurodev16/therapy_API.git"
   },
   "author": "Mauro Rodrigues da Silva",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/maurodev16/therapy_api/issues"
+    "url": "https://github.com/maurodev16/therapy_API/issues"
   },
-  "homepage": "https://github.com/maurodev16/therapy_api#readme",
+  "homepage": "https://github.com/maurodev16/therapy_API#readme",
   "dependencies": {
     "accounting": "^0.4.1",
     "bcrypt": "^5.1.1",
