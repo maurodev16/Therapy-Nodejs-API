@@ -33,12 +33,27 @@ router.post("/create", async (req, res) => {
 });
 
 // READ (R)
-router.get("/", async (req, res) => {
+router.get('/fetch',  async (req, res) => {///checkToken,
   try {
-    const users = await User.find();
-    res.json(users);
+    const users = await User.find().select('-password');
+
+    if (!users) {
+      return res.status(404).send("UserNotFoundException");
+    }
+
+    const userdata = users.map(user => {
+      return {
+        id: user._id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      }
+    })
+    res.status(200).send(userdata)
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).send(error)
   }
 });
 
