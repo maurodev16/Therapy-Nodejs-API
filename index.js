@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const cloudinary = require('cloudinary').v2;
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swaggerConfig'); 
+const userRoutes = require('./routers/UserRouters');
 
 
 const fs = require('fs');
@@ -17,11 +18,8 @@ app.use(express.json());
 
 // Configuração do Swagger
 app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/api/v1/user", userRoutes);
 
-app.use('/', (_req, _res)=>{
-    _res.send('Bem vindo!');
-
-});
 
 // Connect to MongoDB
 const DB_USER = process.env.DB_USER
