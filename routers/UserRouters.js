@@ -1,36 +1,34 @@
-const express = require("express");
-const router = express.Router();
-const mongoose = require("mongoose");
+require('dotenv').config();
+const router = require('express').Router();
 const User = require("../models/userSchema");
 
 // CREATE (C)
 router.post("/create", async (req, res) => {
   const { first_name, last_name, email, password } = req.body;
-
   try {
     // Verifica se o email do User já está em uso
-    const emailExists = await User.findOne({ email: email });
+    const emailExists = await User.findOne({ email });
     if (emailExists) {
-      return res.status(422).send("EmailAlreadyExistsException");
+      return res.status(422).json({ error: "EmailAlreadyExistsException" });
     }
 
     const user = new User({
-      first_name: first_name,
-      last_name: last_name,
-      email: email,
-      password: password,
+      first_name,
+      last_name,
+      email,
+      password,
     });
 
-    const newCreatedUser = await user.save({ user });
-    console.log(newCreatedUser);
+    const newCreatedUser = await user.save();
 
     if (!newCreatedUser) {
-      return Error("ErroSignupOnDatabaseException");
+      return res.status(500).json({ error: "ErroSignupOnDatabaseException" });
     }
 
     return res.status(201).json({ newCreatedUser });
   } catch (error) {
-    return res.status(500).send("ErroSignupException");
+    console.error(`Erro to create user: ${error}`);
+    return res.status(500).json({ error: "InternalServerError" });
   }
 });
 
