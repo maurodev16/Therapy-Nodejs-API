@@ -24,7 +24,7 @@ router.post("/create", async (req, res) => {
     if (!newCreatedUser) {
       return res.status(500).json({ error: "ErroSignupOnDatabaseException" });
     }
-
+    user.user_id= newCreatedUser._id;
     return res.status(201).json({ newCreatedUser });
   } catch (error) {
     console.error(`Erro to create user: ${error}`);
@@ -43,7 +43,7 @@ router.get('/fetch',  async (req, res) => {///checkToken,
 
     const userdata = users.map(user => {
       return {
-        id: user._id,
+        user_id: user._id,
         first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
