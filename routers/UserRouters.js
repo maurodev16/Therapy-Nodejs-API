@@ -49,6 +49,7 @@ router.get('/fetch',  async (req, res) => {///checkToken,
         email: user.email,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
+        
       }
     })
     res.status(200).send(userdata)
