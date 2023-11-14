@@ -43,7 +43,7 @@ router.get("/fetch", async (req, res) => {
 
     const userdata = users.map((user) => {
       return {
-        user_id: user._id,
+       user_id: user._id,
         client_number: user.client_number,
         first_name: user.first_name,
         last_name: user.last_name,
