@@ -24,7 +24,7 @@ router.post("/create", async (req, res) => {
     if (newCreatedUser) {
       user.user_id = newCreatedUser._id;
       user.client_number = newCreatedUser.client_number;
-      return res.status(201).json({ newCreatedUser });
+      return res.status(201).json({ newCreatedUser: newCreatedUser });
     }
   } catch (error) {
     console.error(`Erro to create user: ${error}`);
@@ -44,7 +44,7 @@ router.get("/fetch", async (req, res) => {
 
     const userdata = users.map((user) => {
       return {
-        user_id: user._id,
+        user_id: user.user_id,
         client_number: user.client_number,
         first_name: user.first_name,
         last_name: user.last_name,
