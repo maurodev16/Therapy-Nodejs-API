@@ -11,40 +11,46 @@ const AUTH_SECRET_KEY = process.env.AUTH_SECRET_KEY;
 /// Login route
 router.post("/login", async (req, res) => {
     try {
-      const { clientNumberOrEmail, password } = req.body;
+      const { email, password } = req.body;
   
-      // Validate User data
-      if (!clientNumberOrEmail) {
-        return res.status(422).send("Please provide a valid email or client number!");
+     
+    // Validate User data
+    if (!email) {
+        console.log(email);
+  
+        return res.status(422).send("Please provide a valid email!");
+  
       }
   
       let user;
   
-   
-    // Find user using email or client_number
-    if (!isNaN(clientNumberOrEmail)) {
-        // Se o valor é um número, considere-o como client_number
-        user = await User.findOne({ client_number: clientNumberOrEmail });
+      // Check if Email is an email using regular expression
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  
+      if (isEmail) {
+        user = await User.findOne({ email: email });
+        console.log(email);
+  
       } else {
-        // Se não for um número, considere-o como email
-        user = await User.findOne({
-          email: { $regex: `^${clientNumberOrEmail}`, $options: "i" },
-        });
+        // Find user using email
+        user = await User.findOne({ email: { $regex: `^${email}`, $options: 'i' } });
+        console.log(user);
       }
   
       if (!user) {
-        return res.status(404).send("No user found with this email or client_number!");
+        return res.status(404).send("No User found with this email!");
       }
   
       if (!password) {
         return res.status(422).json("Password is required!");
-      }
   
+      }
       // Verify password
       const isPasswordValid = await bcrypt.compare(password, user.password);
   
       if (!isPasswordValid) {
-        return res.status(422).json("Incorrect password");
+        return res.status(422).json('Incorrect password');
+  
       }
   
       // Generate token
