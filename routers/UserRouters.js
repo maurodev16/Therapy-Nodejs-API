@@ -35,25 +35,13 @@ router.post("/create", async (req, res) => {
 router.get("/fetch", async (req, res) => {
   ///checkToken,
   try {
-    const users = await User.find().select("-password");
+    const users = await User.find().select("-password").select("-__v");
 
     if (!users) {
       return res.status(404).send("UserNotFoundException");
     }
 
-    const userdata = users.map((user) => {
-      return {
-       user_id: user._id,
-        client_number: user.client_number,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        user_type: user.user_type,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      };
-    });
-    res.status(200).json({ userdata: userdata });
+    res.status(200).json({ userdata: users });
   } catch (error) {
     res.status(500).send(error);
   }
