@@ -14,15 +14,14 @@ router.post("/create", async (req, res) => {
     }
 
     const user = new User({
-      first_name:first_name,
-      last_name:last_name,
-      email:email,
-      password:password,
+      first_name: first_name,
+      last_name: last_name,
+      email: email,
+      password: password,
     });
 
     const newCreatedUser = await user.save();
     if (newCreatedUser) {
-      user.user_id = newCreatedUser._id;
       user.client_number = newCreatedUser.client_number;
       return res.status(201).json({ newCreatedUser: newCreatedUser });
     }
@@ -44,7 +43,7 @@ router.get("/fetch", async (req, res) => {
 
     const userdata = users.map((user) => {
       return {
-        user_id: user.user_id,
+        user_id: user._id,
         client_number: user.client_number,
         first_name: user.first_name,
         last_name: user.last_name,

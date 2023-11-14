@@ -5,7 +5,6 @@ const bcryptSalt = process.env.BCRYPT_SALT;
 
 const userSchema = new mongoose.Schema(
   {
-    user_id: { type: String },
     client_number: { type: Number, unique: true },
     first_name: { type: String, required: true },
     last_name: { type: String, required: true },
