@@ -14,10 +14,10 @@ router.post("/create", async (req, res) => {
     }
 
     const user = new User({
-      first_name,
-      last_name,
-      email,
-      password,
+      first_name:first_name,
+      last_name:last_name,
+      email:email,
+      password:password,
     });
 
     const newCreatedUser = await user.save();
