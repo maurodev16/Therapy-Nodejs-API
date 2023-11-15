@@ -3,7 +3,7 @@ const User = require("../models/userSchema");
 
 // Documents Schema
 const documentSchema = new mongoose.Schema({
-  user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  user_obj: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   documen_name: { type: String },
   send_date: { type: Date },
   document_type: { type: String },

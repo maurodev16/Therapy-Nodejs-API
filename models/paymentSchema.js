@@ -3,7 +3,7 @@ const User = require("../models/userSchema");
 
 // Payment Schema
 const paymentSchema = new mongoose.Schema({
-  client: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  user_obj: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   due_date: { type: Date },
   is_storned: { type: Boolean, default: false },
   payment_status: {

@@ -7,8 +7,8 @@ const Payment = require("./paymentSchema");
 // Therapy Session Schema
 const appointmentSchema = new mongoose.Schema(
   {
-    date: { type: String, index: true, required: true },
-    time: { type: String, index: true, required: true },
+    date: { type: Date, index: true, required: true },
+    time: { type: Date, index: true, required: true },
     notes: { type: String },
     user_obj: {
       type: mongoose.Schema.Types.ObjectId,
@@ -19,7 +19,7 @@ const appointmentSchema = new mongoose.Schema(
       { type: mongoose.Schema.Types.ObjectId, ref: "ServiceType" },
     ],
     Payment_obj: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment" }],
-    related_documents_obj: [
+    documents_obj: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Document" },
     ],
     is_canceled: { type: Boolean, default: false },

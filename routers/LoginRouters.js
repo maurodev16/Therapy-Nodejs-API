@@ -12,7 +12,6 @@ const AUTH_SECRET_KEY = process.env.AUTH_SECRET_KEY;
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-
     // Validate User data
     if (!email) {
       console.log(email);
@@ -59,7 +58,7 @@ router.post("/login", async (req, res) => {
       },
       AUTH_SECRET_KEY,
       {
-        expiresIn: "1h", // Token expiration time
+      //  expiresIn: "1h", // Token expiration time
       }
     );
 
