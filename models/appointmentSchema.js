@@ -19,9 +19,7 @@ const appointmentSchema = new mongoose.Schema(
       { type: mongoose.Schema.Types.ObjectId, ref: "ServiceType" },
     ],
     Payment_obj: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment" }],
-    documents_obj: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "Document" },
-    ],
+    documents_obj: [{ type: mongoose.Schema.Types.ObjectId, ref: "Document" }],
     is_canceled: { type: Boolean, default: false },
     status: {
       type: String,

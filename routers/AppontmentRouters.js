@@ -15,7 +15,7 @@ async function checkAvailability(date, time) {
     // Retorna verdadeiro se estiver disponível, falso se já estiver reservado
     return !existingAppointment;
   } catch (error) {
-    console.error("Error checking availability:", error);
+    console.error("NOT_AVALIABLE", error);
     throw error; // Rejeita a promessa se ocorrer um erro
   }
 }
