@@ -11,6 +11,8 @@ async function checkAvailability(date, time) {
   try {
     // Consulta o banco de dados para verificar se a date e hora já foram reservadas
     const existingAppointment = await Appointment.findOne({ date, time });
+    console.log(date);
+    console.log(time);
 
     // Retorna verdadeiro se estiver disponível, falso se já estiver reservado
     return !existingAppointment;
@@ -53,7 +55,7 @@ router.post("/create-appointment",checkToken, async (req, res) => {
       res.status(200).json(newAppointment);
     } else {
       // Informa ao cliente que a date e hora não estão disponíveis
-      res.status(409).send("DATA_END_TIME_NOT_AVAIABLE");
+      res.status(409).json({"DATA_END_TIME_NOT_AVAIABLE": isAvailable });
     }
   } catch (error) {
     console.error("Error creating appointment:", error);
