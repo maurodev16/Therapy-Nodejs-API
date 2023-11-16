@@ -15,7 +15,7 @@ async function checkAvailability(date, time) {
     // Retorna verdadeiro se estiver disponível, falso se já estiver reservado
     return !existingAppointment;
   } catch (error) {
-    console.error("NOT_AVALIABLE", error);
+    console.error("Error checking availability:", error);
     throw error; // Rejeita a promessa se ocorrer um erro
   }
 }
@@ -53,11 +53,11 @@ router.post("/create-appointment",checkToken, async (req, res) => {
       res.status(200).json(newAppointment);
     } else {
       // Informa ao cliente que a date e hora não estão disponíveis
-      res.status(409).json({ error: "date and time not available." });
+      res.status(409).send("DATA_END_TIME_NOT_AVAIABLE");
     }
   } catch (error) {
     console.error("Error creating appointment:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).send("ERROR_CREATE_APPOINT");
   }
 });
 
