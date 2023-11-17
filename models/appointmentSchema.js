@@ -20,10 +20,9 @@ const appointmentSchema = new mongoose.Schema(
     ],
     Payment_obj: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment" }],
     documents_obj: [{ type: mongoose.Schema.Types.ObjectId, ref: "Document" }],
-    is_canceled: { type: Boolean, default: false },
     status: {
       type: String,
-      enum: ["open", "done"],
+      enum: ["open", "done", "canceled"],
       default: "open",
     },
   },

@@ -47,7 +47,6 @@ router.post("/create-appointment",checkToken, async (req, res) => {
         service_type_obj: appointmentdate.service_type_obj,
         Payment_obj: appointmentdate.Payment_obj,
         related_documents_obj: appointmentdate.related_documents_obj,
-        is_canceled: appointmentdate.is_canceled,
         status: appointmentdate.status,
         user_obj: userObj,
       });
