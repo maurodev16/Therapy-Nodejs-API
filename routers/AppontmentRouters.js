@@ -5,7 +5,6 @@ const User = require("../models/userSchema");
 const Appointment = require("../models/appointmentSchema");
 const checkToken = require("../middleware/checkToken");
 
-
 // Função para verificar a disponibilidade
 async function checkAvailability(date, time) {
   try {
@@ -22,7 +21,7 @@ async function checkAvailability(date, time) {
   }
 }
 // Rota para criar um novo agendamento
-router.post("/create-appointment",checkToken, async (req, res) => {
+router.post("/create-appointment", checkToken, async (req, res) => {
   try {
     const appointmentdate = req.body;
 
@@ -36,7 +35,10 @@ router.post("/create-appointment",checkToken, async (req, res) => {
     }
 
     // Verifica se a date e hora estão disponíveis
-    const isAvailable = await checkAvailability(appointmentdate.date, appointmentdate.time);
+    const isAvailable = await checkAvailability(
+      appointmentdate.date,
+      appointmentdate.time
+    );
 
     if (isAvailable) {
       // Cria o agendamento se estiver disponível
@@ -54,7 +56,7 @@ router.post("/create-appointment",checkToken, async (req, res) => {
       res.status(200).json(newAppointment);
     } else {
       // Informa ao cliente que a date e hora não estão disponíveis
-      res.status(409).json({"DATA_END_TIME_NOT_AVAIABLE": isAvailable });
+      res.status(409).json({ DATA_END_TIME_NOT_AVAIABLE: isAvailable });
     }
   } catch (error) {
     console.error("Error creating appointment:", error);
@@ -62,55 +64,76 @@ router.post("/create-appointment",checkToken, async (req, res) => {
   }
 });
 
-// Rota para obter compromissos por date
 router.get("/fetch-all-appointments", checkToken, async (req, res) => {
   try {
-    
     // Use a consulta find com o campo indexado
+    const currentDate = new Date();
+
+    // Recupere a lista atualizada de compromissos
     const appointments = await Appointment.find({})
-    .sort({ date: 1 })
-    .select("-__v")
-    .populate("user_obj", "client_number firstname lastname email user_type");
+      .sort({ date: 1 })
+      .select("-__v")
+      .populate("user_obj", "client_number firstname lastname email user_type");
+
+    // Atualize o status para "done" se o compromisso passou da data
+    for (const appointment of appointments) {
+      if (appointment.date < currentDate && appointment.status === "open") {
+        await Appointment.updateMany({ _id: appointment._id }, { $set: { status: "done" } });
+      }
+
+      // Atualize o status para "open" se o compromisso é futuro e o status é "done"
+      if (appointment.date > currentDate && appointment.status === "done") {
+        await Appointment.updateMany({ _id: appointment._id }, { $set: { status: "open" } });
+      }
+    }
+
+    // Recupere a lista atualizada de compromissos após as atualizações
+    const updatedAppointments = await Appointment.find({})
+      .sort({ date: 1 })
+      .select("-__v")
+      .populate("user_obj", "client_number firstname lastname email user_type");
+
+    res.status(200).json(updatedAppointments);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+//***************************************************************** */
+
+router.get("/fetch-appointments-by-user/:user_id", async (req, res) => {
+  try {
+    const userId = req.params.user_id;
+    const appointments = await Appointment.find({ user: userId })
+      .sort({ date: 1 })
+      .select("-__v")
+      .populate("user_obj", "client_number firstname lastname email user_type");
+
+    if (appointments.length === 0) {
+      return res.status(404).json({ msg: "appointment not found" });
+    }
+
+    return res.status(201).json(appointments); // Retorna os appointments encontrados
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+//***************************************************************** */
+router.get("/fetch-all-appointments", checkToken, async (req, res) => {
+  try {
+    const { user_id } = req.query;
+
+    // Use a consulta find com o campo indexado
+    const appointments = await Appointment.find({ user_id })
+      .sort({ date: 1 })
+      .select("-__v")
+      .populate("user_obj", "client_number firstname lastname email user_type");
 
     res.status(200).json(appointments);
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-  //***************************************************************** */
 
-router.get("/fetch-appointments-by-user/:user_id", async (req, res) => {
-    try {
-      const userId = req.params.user_id;
-      const appointments = await Appointment.find({ user: userId })
-      .sort({ date: 1 })
-      .select("-__v")
-      .populate("user_obj", "client_number firstname lastname email user_type");
-  
-      if (appointments.length === 0) {
-        return res.status(404).json({ msg: "appointment not found" });
-      }
-  
-      return res.status(201).json(appointments); // Retorna os appointments encontrados
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
-    }
-  });
-  //***************************************************************** */
-  router.get("/fetch-all-appointments", checkToken, async (req, res) => {
-    try {
-      const { user_id } = req.query;
-  
-      // Use a consulta find com o campo indexado
-      const appointments = await Appointment.find({ user_id })
-        .sort({ date: 1 })
-        .select("-__v")
-        .populate("user_obj", "client_number firstname lastname email user_type");
-  
-      res.status(200).json(appointments);
-    } catch (error) {
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  });
-  
 module.exports = router;
