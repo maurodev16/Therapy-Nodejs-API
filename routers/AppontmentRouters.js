@@ -68,7 +68,7 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
     
     // Use a consulta find com o campo indexado
     const appointments = await Appointment.find({})
-    .sort({ createdAt: 1 })
+    .sort({ date: 1 })
     .select("-__v")
     .populate("user_obj", "client_number firstname lastname email user_type");
 
@@ -77,12 +77,13 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+  //***************************************************************** */
 
 router.get("/fetch-appointments-by-user/:user_id", async (req, res) => {
     try {
       const userId = req.params.user_id;
       const appointments = await Appointment.find({ user: userId })
-      .sort({ createdAt: 1 })
+      .sort({ date: 1 })
       .select("-__v")
       .populate("user_obj", "client_number firstname lastname email user_type");
   
@@ -95,13 +96,14 @@ router.get("/fetch-appointments-by-user/:user_id", async (req, res) => {
       return res.status(500).json({ error: error.message });
     }
   });
+  //***************************************************************** */
   router.get("/fetch-all-appointments", checkToken, async (req, res) => {
     try {
       const { user_id } = req.query;
   
       // Use a consulta find com o campo indexado
       const appointments = await Appointment.find({ user_id })
-        .sort({ createdAt: 1 })
+        .sort({ date: 1 })
         .select("-__v")
         .populate("user_obj", "client_number firstname lastname email user_type");
   
