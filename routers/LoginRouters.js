@@ -22,7 +22,7 @@ router.post("/login", async (req, res) => {
     let user;
 
     // Check if Email is an email using regular expression
-    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/(email);
 
     if (isEmail) {
       user = await User.findOne({ email: email });

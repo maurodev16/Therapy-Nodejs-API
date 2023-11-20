@@ -78,7 +78,7 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
     const appointments = await Appointment.find({})
       .sort({ date: 1 })
       .select("-__v")
-      .populate("user_obj", "client_number firstname lastname email user_type");
+      .populate("user_obj", "client_number first_name last_name email phone user_type");
 
     // Atualize o status para "done" se o compromisso passou da data
     for (const appointment of appointments) {
@@ -96,7 +96,7 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
     const updatedAppointments = await Appointment.find({})
       .sort({ date: 1 })
       .select("-__v")
-      .populate("user_obj", "client_number firstname lastname email user_type");
+      .populate("user_obj", "client_number first_name last_name email phone user_type");
 
     res.status(200).json(updatedAppointments);
   } catch (error) {

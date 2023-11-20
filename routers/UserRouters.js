@@ -5,20 +5,20 @@ const User = require("../models/userSchema");
 
 // CREATE (C)
 router.post("/create", async (req, res) => {
-  const { first_name, last_name, phone, email, password } = req.body;
+  const userData = req.body;
+
   try {
     // Verifica se o email do User já está em uso
-    const emailExists = await User.findOne({ email });
+    const emailExists = await User.findOne({ email: userData.email });
     if (emailExists) {
       return res.status(422).json({ error: "EmailAlreadyExistsException" });
     }
-
     const user = new User({
-      first_name: first_name,
-      last_name: last_name,
-      phone: phone,
-      email: email,
-      password: password,
+      first_name: userData.first_name,
+      last_name: userData.last_name,
+      phone: userData.phone,
+      email: userData.email,
+      password: userData.password,
     });
 
     const newCreatedUser = await user.save();
@@ -36,12 +36,13 @@ router.post("/create", async (req, res) => {
 router.get("/fetch", async (req, res) => {
   ///checkToken,
   try {
-    const users = await User.find().select("-password").select("-__v");
-
-    if (!users) {
+    const users = await User.find().sort({ client_number: 1 })
+    .select("-__v")
+    .select("-password")
+    .populate("invoice_obj", "invoice_url over_duo status");;
+   if (!users) {
       return res.status(404).send("UserNotFoundException");
     }
-
     res.status(200).json({ userdata: users });
   } catch (error) {
     res.status(500).send(error);

@@ -16,10 +16,6 @@ const userSchema = new mongoose.Schema(
     user_type: { type: String, enum: ["admin", "client"], default: "client" },
     invoice_obj: [{ type: mongoose.Schema.Types.ObjectId, ref: "Invoice" }],
     invoice_qnt: { type: Number, default: 0 },
-    appointment_obj: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "Appointment" },
-    ],
-    appointment_qnt: { type: Number, default: 0 },
   },
   {
     timestamps: true,

@@ -1,12 +1,22 @@
 const mongoose = require("mongoose");
 const User = require("./userSchema");
-const Appointment = require('./appointmentSchema');
+const Appointment = require("./appointmentSchema");
 
 // Invoices Schema
 const invoiceSchema = new mongoose.Schema(
-  { 
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  {
+    user_obj: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     invoice_url: { type: String },
+    over_duo: { type: Date },
+    status: {
+      type: String,
+      enum: ["open", "pending", "completed", "overduo"],
+      default: "open",
+    },
   },
   {
     timestamps: true,
@@ -17,4 +27,3 @@ const invoiceSchema = new mongoose.Schema(
 const Invoice = mongoose.model("Invoice", invoiceSchema);
 
 module.exports = Invoice;
-
