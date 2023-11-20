@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const User = require("./userSchema");
-const Document = require("./documentSchema");
+const Invoice = require("./invoiceSchema");
 const ServiceType = require("./serviceSchema");
 const Payment = require("./paymentSchema");
 
@@ -18,8 +18,8 @@ const appointmentSchema = new mongoose.Schema(
     service_type_obj: [
       { type: mongoose.Schema.Types.ObjectId, ref: "ServiceType" },
     ],
-    Payment_obj: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment" }],
-    documents_obj: [{ type: mongoose.Schema.Types.ObjectId, ref: "Document" }],
+    payment_obj: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment" }],
+   
     status: {
       type: String,
       enum: ["open", "done", "canceled"],

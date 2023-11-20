@@ -8,16 +8,16 @@ const storage = multer.diskStorage({
 
 const fileFilter = (req, file, cb) => {
     // Verificar se o tipo do arquivo é válido
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/pdf'];
     if (allowedMimeTypes.includes(file.mimetype)) {
         cb(null, true);
     } else {
         // Rejeitar o arquivo
-        cb(new Error('Unsupported Image Format, only JPEG, PNG, JPG, and GIF can be supported.'), false);
+        cb(new Error('Unsupported File Format, only JPEG, PNG, JPG, and PDF can be supported.'), false);
     }
 };
 
-const uploadSingleBanner = multer({
+const uploadSingleInvoice = multer({
     storage: storage,
     limits: {
         fileSize: 1024 * 1024 * 5 // Limite de 5MB
@@ -25,4 +25,4 @@ const uploadSingleBanner = multer({
     
 });
 
-module.exports = uploadSingleBanner;
+module.exports = uploadSingleInvoice;

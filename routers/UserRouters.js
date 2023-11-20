@@ -5,7 +5,7 @@ const User = require("../models/userSchema");
 
 // CREATE (C)
 router.post("/create", async (req, res) => {
-  const { first_name, last_name, email, password } = req.body;
+  const { first_name, last_name, phone, email, password } = req.body;
   try {
     // Verifica se o email do User já está em uso
     const emailExists = await User.findOne({ email });
@@ -16,6 +16,7 @@ router.post("/create", async (req, res) => {
     const user = new User({
       first_name: first_name,
       last_name: last_name,
+      phone: phone,
       email: email,
       password: password,
     });

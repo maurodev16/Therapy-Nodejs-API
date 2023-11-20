@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const Invoice = require("./invoiceSchema");
+const Appointment = require("./appointmentSchema");
 require("dotenv").config();
 const bcryptSalt = process.env.BCRYPT_SALT;
 
@@ -9,8 +11,15 @@ const userSchema = new mongoose.Schema(
     first_name: { type: String, required: true },
     last_name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
+    phone: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    user_type: { type: String, enum: ['admin', 'client'], default:"client" },
+    user_type: { type: String, enum: ["admin", "client"], default: "client" },
+    invoice_obj: [{ type: mongoose.Schema.Types.ObjectId, ref: "Invoice" }],
+    invoice_qnt: { type: Number, default: 0 },
+    appointment_obj: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Appointment" },
+    ],
+    appointment_qnt: { type: Number, default: 0 },
   },
   {
     timestamps: true,
@@ -18,13 +27,13 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  // Apenas incrementa o client_number se for um novo documento
   if (!this.isNew) {
     return next();
   }
 
   // Consulta o último client_number no banco de dados
-  const lastClient = await mongoose.model("User", userSchema)
+  const lastClient = await mongoose
+    .model("User", userSchema)
     .findOne({}, { client_number: 1 }, { sort: { client_number: -1 } })
     .lean();
 
@@ -44,7 +53,6 @@ userSchema.pre("save", async function (next) {
 
   next();
 });
-
 
 const User = mongoose.model("User", userSchema);
 
