@@ -33,7 +33,7 @@ router.post("/create-appointment", checkToken, async (req, res) => {
       status,
     } = req.body;
 
-    const userId = req.auth.user_id;
+    const userId = req.auth._id;
     console.log(userId);
 
     const userObj = await User.findById(userId).select("-password");
