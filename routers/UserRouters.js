@@ -12,6 +12,10 @@ router.post("/create", async (req, res) => {
     const emailExists = await User.findOne({ email: userData.email });
     if (emailExists) {
       return res.status(422).json({ error: "EmailAlreadyExistsException" });
+    }   // Verifica se o email do User já está em uso
+    const phoneExists = await User.findOne({ phone: userData.phone });
+    if (phoneExists) {
+      return res.status(422).json({ error: "PhoneAlreadyExistsException" });
     }
     const user = new User({
       first_name: userData.first_name,
