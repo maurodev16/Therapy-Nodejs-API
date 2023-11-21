@@ -113,7 +113,7 @@ router.get("/fetch-appointments-by-user/:user_id",checkToken, async (req, res) =
       const appointments = await Appointment.find({ user: userId })
       .sort({ createdAt: 1 })
       .select("-__v")
-      .populate("user_obj", "client_number firstname lastname email user_type");
+      .populate("user_obj", "client_number first_name last_name email user_type");
   
       if (appointments.length === 0) {
         return res.status(404).json({ msg: "appointment not found" });
@@ -134,7 +134,7 @@ router.get("/fetch-appointments-by-user/:user_id",checkToken, async (req, res) =
       const appointments = await Appointment.find({ user_id })
         .sort({ createdAt: 1 })
         .select("-__v")
-        .populate("user_obj", "client_number firstname lastname email user_type");
+        .populate("user_obj", "client_number first_name last_name email user_type");
   
       res.status(200).json(appointments);
     } catch (error) {
