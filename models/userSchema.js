@@ -38,8 +38,8 @@ userSchema.pre("save", async function (next) {
   this.client_number = newClientNumber;
 
   // Garante que user_id seja exclusivo e não nulo
-  if (!this.user_id) {
-    this.user_id = new mongoose.Types.ObjectId();
+  if (!this._id) {
+    this._id = new mongoose.Types.ObjectId();
   }
 
   if (this.isModified("password")) {

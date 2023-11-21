@@ -17,7 +17,7 @@ function checkToken(req, res, next) {
     }
 
     // If the token is valid, save the Auth ID in the request
-    req.auth = { user_id: decoded.user_id };///user_id é apenas uma variavel que deve ser usada nas rotas, o que vale e o decoded.user_id
+    req.auth = { _id: decoded._id };///user_id é apenas uma variavel que deve ser usada nas rotas, o que vale e o decoded.user_id
     next();
   });
 }

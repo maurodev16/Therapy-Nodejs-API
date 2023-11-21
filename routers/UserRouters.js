@@ -32,7 +32,7 @@ router.post("/create", async (req, res) => {
     }
   } catch (error) {
     console.error(`Erro to create user: ${error}`);
-    return res.status(500).json({ error: "InternalServerError" });
+    return res.status(500).json({ error: "ErroSignupOnDatabaseException" });
   }
 });
 

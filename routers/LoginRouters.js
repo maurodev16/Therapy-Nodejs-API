@@ -52,7 +52,7 @@ router.post("/login", async (req, res) => {
     // Generate token
     const token = jwt.sign(
       {
-        user_id: user._id,
+        _id: user._id,
         user_type: user.user_type,
         client_number: user.client_number,
       },
@@ -65,7 +65,7 @@ router.post("/login", async (req, res) => {
     // Return the authentication token and user information
 
     return res.status(200).json({
-      user_id: user._id,
+      _id: user._id,
       client_number: user.client_number,
       first_name: user.first_name,
       last_name: user.last_name,
