@@ -22,6 +22,9 @@ const appointmentSchema = new mongoose.Schema(
       enum: ["open", "done", "canceled"],
       default: "open",
     },
+    canceled_by: {
+      type: mongoose.Schema.Types.ObjectId, ref: "User",
+    },
   },
   {
     timestamps: true,

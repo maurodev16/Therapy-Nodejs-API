@@ -141,5 +141,33 @@ router.get("/fetch-appointments-by-user/:user_id",checkToken, async (req, res) =
       res.status(500).json({ error: "Internal Server Error" });
     }
   });
+
+  router.post('/cancel-appointment/:appointmentId', async (req, res) => {
+    const user_id   = req.body; // Supondo que você está enviando o ID do usuário no corpo da solicitação
+    const  appointmentId  = req.params;
+  
+    try {
+      // Verifique se o compromisso existe
+      const appointment = await Appointment.findById(appointmentId);
+      if (!appointment) {
+        return res.status(404).json({ error: 'Appointment not found' });
+      }
+  
+      // Verifique se o usuário é o proprietário do compromisso ou é um administrador
+      if (appointment.user_obj.equals(user_id) ||appointment.user_obj.equals("655c7332b35063d3cbc1e5be")) {
+        // Atualize o status para "canceled" e registre quem cancelou
+        appointment.status = 'canceled';
+        appointment.canceled_by = user_id;
+        await appointment.save();
+  
+        res.status(200).json(appointment);
+      } else {
+        res.status(403).json({ error: 'Permission denied' });
+      }
+    } catch (error) {
+      console.error('Error canceling appointment:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
   
 module.exports = router;
