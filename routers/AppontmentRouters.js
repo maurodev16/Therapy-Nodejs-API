@@ -107,9 +107,9 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
 
 //***************************************************************** */
 
-router.get("/fetch-appointments-by-user/:user_id", async (req, res) => {
+router.get("/fetch-appointments-by-user/:user_id",checkToken, async (req, res) => {
     try {
-      const userId = req.params.user_id;
+      const userId = req.params._id;
       const appointments = await Appointment.find({ user: userId })
       .sort({ createdAt: 1 })
       .select("-__v")
@@ -124,9 +124,11 @@ router.get("/fetch-appointments-by-user/:user_id", async (req, res) => {
       return res.status(500).json({ error: error.message });
     }
   });
+
+
   router.get("/fetch-all-appointments", checkToken, async (req, res) => {
     try {
-      const { user_id } = req.query;
+      const  {user_id } = req.query;
   
       // Use a consulta find com o campo indexado
       const appointments = await Appointment.find({ user_id })
