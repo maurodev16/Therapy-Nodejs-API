@@ -23,40 +23,35 @@ async function checkAvailability(date, time) {
 // Rota para criar um novo agendamento
 router.post("/create-appointment", checkToken, async (req, res) => {
   try {
-    const {
-      date,
-      time,
-      notes,
-      service_type_obj,
-      payment_obj,
-      invoice_obj,
-      status,
-    } = req.body;
+    const appointmentData = req.body;
 
     const userId = req.auth._id;
     console.log(userId);
 
-    const userObj = await User.findById(userId).select("-password");
-    console.log(userObj);
-    if (!userObj) {
+    const user_obj = await User.findById(userId).select("-password");
+    console.log(user_obj);
+    if (!user_obj) {
       return res.status(404).send("User not found");
     }
 
     // Verifica se a date e hora estão disponíveis
-    const isAvailable = await checkAvailability(date, time);
+    const isAvailable = await checkAvailability(
+      appointmentData.date,
+      appointmentData.time
+    );
 
     if (isAvailable) {
       // Cria o agendamento se estiver disponível
       const appointment = await Appointment({
-        date: date,
-        time: time,
-        notes: notes,
-        service_type_obj: service_type_obj,
-        Payment_obj: payment_obj,
-        invoice_obj: invoice_obj,
-        status: status,
-        user_obj: userObj,
+        date: appointmentData.date,
+        time: appointmentData.time,
+        notes: appointmentData.notes,
+        service_type_obj: appointmentData.service_type_obj,
+        status: appointmentData.status,
+        canceled_by: appointmentData.canceled_by,
+        user_obj: user_obj,
       });
+
       const newAppointment = await appointment.save();
       res.status(200).json(newAppointment);
     } else {
@@ -78,17 +73,27 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
     const appointments = await Appointment.find({})
       .sort({ date: 1 })
       .select("-__v")
-      .populate("user_obj", "client_number first_name last_name email phone user_type");
+      .populate(
+        "user_obj",
+        "client_number first_name last_name email phone user_type"
+      )
+      .populate("canceled_by", "first_name last_name user_type");
 
     // Atualize o status para "done" se o compromisso passou da data
     for (const appointment of appointments) {
       if (appointment.date < currentDate && appointment.status === "open") {
-        await Appointment.updateMany({ _id: appointment._id }, { $set: { status: "done" } });
+        await Appointment.updateMany(
+          { _id: appointment._id },
+          { $set: { status: "done" } }
+        );
       }
 
       // Atualize o status para "open" se o compromisso é futuro e o status é "done"
       if (appointment.date > currentDate && appointment.status === "done") {
-        await Appointment.updateMany({ _id: appointment._id }, { $set: { status: "open" } });
+        await Appointment.updateMany(
+          { _id: appointment._id },
+          { $set: { status: "open" } }
+        );
       }
     }
 
@@ -96,7 +101,10 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
     const updatedAppointments = await Appointment.find({})
       .sort({ date: 1 })
       .select("-__v")
-      .populate("user_obj", "client_number first_name last_name email phone user_type");
+      .populate(
+        "user_obj",
+        "client_number first_name last_name email phone user_type"
+      ).populate("canceled_by", "first_name last_name user_type");
 
     res.status(200).json(updatedAppointments);
   } catch (error) {
@@ -104,70 +112,63 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
   }
 });
 
-
 //***************************************************************** */
 
-router.get("/fetch-appointments-by-user/:user_id",checkToken, async (req, res) => {
+router.get(
+  "/fetch-appointments-by-user/:user_id",
+  checkToken,
+  async (req, res) => {
     try {
       const userId = req.params._id;
       const appointments = await Appointment.find({ user: userId })
-      .sort({ createdAt: 1 })
-      .select("-__v")
-      .populate("user_obj", "client_number first_name last_name email phone user_type");
-  
+        .sort({ createdAt: 1 })
+        .select("-__v")
+        .populate(
+          "user_obj",
+          "client_number first_name last_name email phone user_type"
+        ).populate("canceled_by", "first_name last_name user_type");
+
       if (appointments.length === 0) {
         return res.status(404).json({ msg: "appointment not found" });
       }
-  
+
       return res.status(201).json(appointments); // Retorna os appointments encontrados
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
-  });
+  }
+);
 
+router.post("/cancel-appointment/:appointmentId", async (req, res) => {
+  const appointmentId = req.params.appointmentId;
+  const user_id = req.body.user_id; // Certifique-se de pegar o campo correto do corpo da solicitação
 
-  router.get("/fetch-all-appointments", checkToken, async (req, res) => {
-    try {
-      const  {user_id } = req.query;
-  
-      // Use a consulta find com o campo indexado
-      const appointments = await Appointment.find({ user_id })
-        .sort({ createdAt: 1 })
-        .select("-__v")
-        .populate("user_obj", "client_number first_name last_name email phone user_type");
-  
-      res.status(200).json(appointments);
-    } catch (error) {
-      res.status(500).json({ error: "Internal Server Error" });
+  try {
+    // Verifique se o compromisso existe
+    const appointment = await Appointment.findById(appointmentId);
+
+    if (!appointment) {
+      return res.status(404).json({ error: "Appointment not found" });
     }
-  });
 
-  router.post('/cancel-appointment/:appointmentId', async (req, res) => {
-    const user_id   = req.body; // Supondo que você está enviando o ID do usuário no corpo da solicitação
-    const  appointmentId  = req.params;
-  
-    try {
-      // Verifique se o compromisso existe
-      const appointment = await Appointment.findById(appointmentId);
-      if (!appointment) {
-        return res.status(404).json({ error: 'Appointment not found' });
-      }
-  
-      // Verifique se o usuário é o proprietário do compromisso ou é um administrador
-      if (appointment.user_obj.equals(user_id) ||appointment.user_obj.equals("655c7332b35063d3cbc1e5be")) {
-        // Atualize o status para "canceled" e registre quem cancelou
-        appointment.status = 'canceled';
-        appointment.canceled_by = user_id;
-        await appointment.save();
-  
-        res.status(200).json(appointment);
-      } else {
-        res.status(403).json({ error: 'Permission denied' });
-      }
-    } catch (error) {
-      console.error('Error canceling appointment:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    // Verifique se o usuário é o proprietário do compromisso ou é um administrador
+    if (
+      appointment.user_obj.equals(user_id) ||
+      user_id === "655c7332b35063d3cbc1e5be"
+    ) {
+      // Atualize o status para "canceled" e registre quem cancelou
+      appointment.status = "canceled";
+      appointment.canceled_by = user_id;
+      await appointment.save();
+
+      res.status(200).json(appointment);
+    } else {
+      res.status(403).json({ error: "Permission denied" });
     }
-  });
-  
+  } catch (error) {
+    console.error("Error canceling appointment:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 module.exports = router;

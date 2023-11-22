@@ -58,7 +58,7 @@ router.post("/login", async (req, res) => {
       },
       AUTH_SECRET_KEY,
       {
-      //  expiresIn: "1h", // Token expiration time
+        //  expiresIn: "1h", // Token expiration time
       }
     );
 

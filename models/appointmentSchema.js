@@ -16,15 +16,13 @@ const appointmentSchema = new mongoose.Schema(
     },
     service_type_obj: [
       { type: mongoose.Schema.Types.ObjectId, ref: "ServiceType" },
-    ],   
+    ],
     status: {
       type: String,
       enum: ["open", "done", "canceled"],
       default: "open",
     },
-    canceled_by: {
-      type: mongoose.Schema.Types.ObjectId, ref: "User",
-    },
+    canceled_by: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   {
     timestamps: true,
