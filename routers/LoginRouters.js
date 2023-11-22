@@ -77,6 +77,7 @@ router.post("/login", async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+    console.log(error)
     return res.status(500).send("An error occurred during login.");
   }
 });
