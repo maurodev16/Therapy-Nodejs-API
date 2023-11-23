@@ -23,6 +23,7 @@ router.post("/create", async (req, res) => {
       phone: userData.phone,
       email: userData.email,
       password: userData.password,
+      user_type: userData.user_type,
     });
 
     const newCreatedUser = await user.save();

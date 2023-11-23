@@ -8,38 +8,48 @@ const uploadSingleInvoice = require("../middleware/multerSingleInvoiceMiddleware
 const checkToken = require("../middleware/checkToken");
 
 // Rota para criar uma nova fatura
-router.post("/create-invoice", checkToken, uploadSingleInvoice.single("file"), async (req, res) => {
+router.post(
+  "/create-invoice",
+  checkToken,
+  uploadSingleInvoice.single("file"),
+  async (req, res) => {
     try {
       const invoiceData = await req.body;
-
-      // Verificar se foram enviadas fotos para a galeria
-      if (!req.file || req.file.length === 0) {
-        return res.status(400).send("No file provided");
-      }
-      console.log(req.file);
 
       // Verifica se o usuário existe
       const user = await User.findById(invoiceData.user_obj).select(
         "-password"
       );
       console.log(user);
-
       if (!user) {
         return res.status(404).json({ error: "User not found" });
+      }
+
+      // Verificar se o usuário atual é um admin
+      console.log(user.user_type);
+      if (user.user_type !== "admin") {
+        return res
+          .status(403)
+          .send("Permission denied. Only admins can create invoices.");
       }
 
       // Verifica se o Appointment existe
       const appointment = await Appointment.findById(
         invoiceData.appointment_obj
       );
+      console.log(appointment);
 
       if (!appointment) {
         return res.status(400).json({ error: "Appointment not found" });
       }
 
+      // Verificar se foram enviadas fotos para a galeria
+      if (!req.file || req.file.length === 0) {
+        return res.status(400).send("No file provided");
+      }
+      console.log(req.file);
       const file = req.file;
-
-      const public_id = `${user.last_name}-${user._id}-${
+      const public_id = `${appointment._id}-${appointment.user_obj}-${
         file.originalname.split(".")[0]
       }`;
 
@@ -51,32 +61,32 @@ router.post("/create-invoice", checkToken, uploadSingleInvoice.single("file"), a
         overwrite: false,
         upload_preset: "wasGehtAb_preset",
       });
-      
       console.log(result);
-      
+
       if (!result.secure_url) {
         return res.status(500).send("Error uploading Invoice to cloudinary");
       }
-      
+
       // Cria a fatura no schema Invoice
       const invoice = new Invoice({
         invoice_url: result.secure_url,
-        user_obj: user._id,
+        user_obj: appointment.user_obj,
         appointment_obj: appointment._id,
         over_duo: invoiceData.over_duo,
+        create_by: user.user_type,
         status: invoiceData.status,
       });
 
       // Atualiza os dados do appointment
-      appointment.invoice_obj = invoice._id;
-      appointment.invoice_qnt = (appointment.invoice_qnt || 0) + 1;
+      appointment.invoice_obj.push(invoice._id);
+      appointment.invoice_qnt = appointment.invoice_obj.length;
       await appointment.save();
       console.log(appointment);
 
       // Salva a fatura no banco de dados
       await invoice.save();
 
-      res.status(200).json({ invoice });
+      res.status(200).json(invoice);
     } catch (error) {
       console.error(error);
       res.status(500).send("Internal Server Error");
