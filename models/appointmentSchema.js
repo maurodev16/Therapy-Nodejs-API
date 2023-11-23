@@ -9,6 +9,8 @@ const appointmentSchema = new mongoose.Schema(
     date: { type: Date, index: true, required: true },
     time: { type: Date, index: true, required: true },
     notes: { type: String },
+    invoice_obj: [{ type: mongoose.Schema.Types.ObjectId, ref: "Invoice" }],
+    invoice_qnt: { type: Number, default: 0 },
     user_obj: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

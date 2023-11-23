@@ -10,6 +10,11 @@ const invoiceSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    appointment_obj: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Appointment",
+      required: true,
+    },
     invoice_url: { type: String },
     over_duo: { type: Date },
     status: {

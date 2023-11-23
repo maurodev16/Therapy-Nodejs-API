@@ -14,8 +14,6 @@ const userSchema = new mongoose.Schema(
     phone: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     user_type: { type: String, enum: ["admin", "client"], default: "client" },
-    invoice_obj: [{ type: mongoose.Schema.Types.ObjectId, ref: "Invoice" }],
-    invoice_qnt: { type: Number, default: 0 },
   },
   {
     timestamps: true,

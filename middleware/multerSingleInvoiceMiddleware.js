@@ -1,14 +1,10 @@
 const multer = require('multer');
 
-const storage = multer.diskStorage({
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
-    }
-});
+const storage = multer.memoryStorage(); // Salvar os arquivos na memória
 
 const fileFilter = (req, file, cb) => {
     // Verificar se o tipo do arquivo é válido
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/pdf'];
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
     if (allowedMimeTypes.includes(file.mimetype)) {
         cb(null, true);
     } else {
@@ -22,7 +18,7 @@ const uploadSingleInvoice = multer({
     limits: {
         fileSize: 1024 * 1024 * 5 // Limite de 5MB
     },
-    
+    fileFilter: fileFilter // Adicione a função de filtro
 });
 
 module.exports = uploadSingleInvoice;
