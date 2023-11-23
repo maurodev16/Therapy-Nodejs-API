@@ -5,12 +5,10 @@ const Invoice = require("../models/invoiceSchema");
 const User = require("../models/userSchema");
 const Appointment = require("../models/appointmentSchema");
 const uploadSingleInvoice = require("../middleware/multerSingleInvoiceMiddleware");
+const checkToken = require("../middleware/checkToken");
 
 // Rota para criar uma nova fatura
-router.post(
-  "/create-invoice",
-  uploadSingleInvoice.single("file"),
-  async (req, res) => {
+router.post("/create-invoice", checkToken, uploadSingleInvoice.single("file"), async (req, res) => {
     try {
       const invoiceData = await req.body;
 

@@ -43,7 +43,6 @@ router.get("/fetch", async (req, res) => {
     const users = await User.find().sort({ client_number: 1 })
     .select("-__v")
     .select("-password")
-    .populate("invoice_obj", "invoice_url over_duo status");;
    if (!users) {
       return res.status(404).send("UserNotFoundException");
     }
