@@ -49,8 +49,6 @@ router.post("/create-appointment", checkToken, async (req, res) => {
         time: appointmentData.time,
         notes: appointmentData.notes,
         service_type_obj: appointmentData.service_type_obj,
-        invoice_obj: appointmentData.invoice_obj,
-        invoice_qnt: appointmentData.invoice_obj,
         user_obj: user_obj,   
         status: appointmentData.status,
       });
