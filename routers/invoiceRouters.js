@@ -20,7 +20,6 @@ router.post(
       const user = await User.findById(invoiceData.user_obj).select(
         "-password"
       );
-      console.log(user);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -37,7 +36,6 @@ router.post(
       const appointment = await Appointment.findById(
         invoiceData.appointment_obj
       );
-      console.log(appointment);
 
       if (!appointment) {
         return res.status(400).json({ error: "Appointment not found" });
@@ -47,7 +45,7 @@ router.post(
       if (!req.file || req.file.length === 0) {
         return res.status(400).send("No file provided");
       }
-      console.log(req.file);
+
       const file = req.file;
       const public_id = `${appointment._id}-${appointment.user_obj}-${
         file.originalname.split(".")[0]
@@ -61,7 +59,6 @@ router.post(
         overwrite: false,
         upload_preset: "wasGehtAb_preset",
       });
-      console.log(result);
 
       if (!result.secure_url) {
         return res.status(500).send("Error uploading Invoice to cloudinary");

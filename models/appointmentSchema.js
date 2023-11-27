@@ -17,7 +17,7 @@ const appointmentSchema = new mongoose.Schema(
       required: true,
     },
     service_type_obj: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "ServiceType" },
+      { type: mongoose.Schema.Types.ObjectId, ref: "ServiceType", default: [] },
     ],
     status: {
       type: String,
