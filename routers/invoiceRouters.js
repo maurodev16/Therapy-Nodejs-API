@@ -77,13 +77,22 @@ router.post(
         status: invoiceData.status,
       });
 
-      // Atualiza os dados do appointment
-      appointment.invoice_obj.push(invoice._id);
-      appointment.invoice_qnt = appointment.invoice_obj.length;
-      await appointment.save();
-      console.log(appointment);
+      // Verifique se appointment.invoice_obj é null ou undefined
+      if (!appointment.invoice_obj) {
+        // Se for null ou undefined, inicialize como um array vazio
+        appointment.invoice_obj = [];
+      }
 
-      // Salva a fatura no banco de dados
+      // Agora você pode chamar push com segurança
+      appointment.invoice_obj.push(invoice._id);
+
+      // Atualize a quantidade de faturas
+      appointment.invoice_qnt = appointment.invoice_obj.length;
+
+      // Salve as alterações no appointment
+      await appointment.save();
+
+      // Salve a fatura no banco de dados
       await invoice.save();
 
       res.status(200).json(invoice);
