@@ -79,14 +79,13 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
         "client_number first_name last_name email phone user_type"
       )
       .populate("invoice_obj", "invoice_url over_duo status");
+    const appointmentDate = new Date(
+      appointments.date + " " + appointments.time
+    );
 
     // Atualize o status para "done" se o compromisso passou da data e da hora
     for (const appointment of appointments) {
-      if (
-        appointment.date &&
-        appointment.time < currentDate &&
-        appointment.status === "open"
-      ) {
+      if (appointmentDate < currentDate && appointment.status === "open") {
         await Appointment.updateMany(
           { _id: appointment._id },
           { $set: { status: "done" } }
@@ -94,11 +93,7 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
       }
 
       // Atualize o status para "open" se o compromisso é futuro e o status é "done"
-      if (
-        appointment.date &&
-        appointment.time > currentDate &&
-        appointment.status === "done"
-      ) {
+      if (appointmentDate > currentDate && appointment.status === "done") {
         await Appointment.updateMany(
           { _id: appointment._id },
           { $set: { status: "open" } }
@@ -138,31 +133,27 @@ router.get(
           "client_number first_name last_name email phone user_type"
         )
         .populate("invoice_obj", "invoice_url over_duo status");
-      // Atualize o status para "done" se o compromisso passou da data e da hora
-      for (const appointment of appointments) {
-        if (
-          appointment.date &&
-          appointment.time < currentDate &&
-          appointment.status === "open"
-        ) {
-          await Appointment.updateMany(
-            { _id: appointment._id },
-            { $set: { status: "done" } }
-          );
+        const appointmentDate = new Date(
+          appointments.date + " " + appointments.time
+        );
+    
+        // Atualize o status para "done" se o compromisso passou da data e da hora
+        for (const appointment of appointments) {
+          if (appointmentDate < currentDate && appointment.status === "open") {
+            await Appointment.updateMany(
+              { _id: appointment._id },
+              { $set: { status: "done" } }
+            );
+          }
+    
+          // Atualize o status para "open" se o compromisso é futuro e o status é "done"
+          if (appointmentDate > currentDate && appointment.status === "done") {
+            await Appointment.updateMany(
+              { _id: appointment._id },
+              { $set: { status: "open" } }
+            );
+          }
         }
-
-        // Atualize o status para "open" se o compromisso é futuro e o status é "done"
-        if (
-          appointment.date &&
-          appointment.time > currentDate &&
-          appointment.status === "done"
-        ) {
-          await Appointment.updateMany(
-            { _id: appointment._id },
-            { $set: { status: "open" } }
-          );
-        }
-      }
 
       if (appointments.length === 0) {
         return res.status(404).json({ msg: "appointment not found" });
