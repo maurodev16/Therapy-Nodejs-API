@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const User = require("../models/userSchema");
 const Appointment = require("../models/appointmentSchema");
 const checkToken = require("../middleware/checkToken");
-const Invoice = require('../models/invoiceSchema')
+const Invoice = require("../models/invoiceSchema");
 
 // Função para verificar a disponibilidade
 async function checkAvailability(date, time) {
@@ -24,7 +24,7 @@ async function checkAvailability(date, time) {
 // Rota para criar um novo agendamento
 router.post("/create-appointment", checkToken, async (req, res) => {
   try {
-    ///Para criar um appoint, o 
+    ///Para criar um appoint, o
     const appointmentData = req.body;
 
     const userId = req.auth._id;
@@ -49,7 +49,7 @@ router.post("/create-appointment", checkToken, async (req, res) => {
         time: appointmentData.time,
         notes: appointmentData.notes,
         service_type_obj: appointmentData.service_type_obj,
-        user_obj: user_obj,   
+        user_obj: user_obj,
         status: appointmentData.status,
       });
 
@@ -70,7 +70,7 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
     // Use a consulta find com o campo indexado
     const currentDate = new Date();
 
-    // Recupere a lista atualizada de compromissos  
+    // Recupere a lista atualizada de compromissos
     const appointments = await Appointment.find({})
       .sort({ date: 1 })
       .select("-__v")
@@ -80,9 +80,12 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
       )
       .populate("invoice_obj", "invoice_url over_duo status");
 
-    // Atualize o status para "done" se o compromisso passou da data
+    // Atualize o status para "done" se o compromisso passou da data e da hora
     for (const appointment of appointments) {
-      if (appointment.date < currentDate && appointment.status === "open") {
+      if (
+        appointment.date ||
+        (appointment.time < currentDate && appointment.status === "open")
+      ) {
         await Appointment.updateMany(
           { _id: appointment._id },
           { $set: { status: "done" } }
@@ -90,7 +93,10 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
       }
 
       // Atualize o status para "open" se o compromisso é futuro e o status é "done"
-      if (appointment.date > currentDate && appointment.status === "done") {
+      if (
+        appointment.date ||
+        (appointment.time > currentDate && appointment.status === "done")
+      ) {
         await Appointment.updateMany(
           { _id: appointment._id },
           { $set: { status: "open" } }
@@ -105,7 +111,8 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
       .populate(
         "user_obj",
         "client_number first_name last_name email phone user_type"
-      ) .populate("invoice_obj", "invoice_url over_duo status");
+      )
+      .populate("invoice_obj", "invoice_url over_duo status");
 
     res.status(200).json(updatedAppointments);
   } catch (error) {
@@ -127,13 +134,44 @@ router.get(
         .populate(
           "user_obj",
           "client_number first_name last_name email phone user_type"
-        ) .populate("invoice_obj", "invoice_url over_duo status");
+        )
+        .populate("invoice_obj", "invoice_url over_duo status");
+      // Atualize o status para "done" se o compromisso passou da data e da hora
+      for (const appointment of appointments) {
+        if (
+          appointment.date ||
+          (appointment.time < currentDate && appointment.status === "open")
+        ) {
+          await Appointment.updateMany(
+            { _id: appointment._id },
+            { $set: { status: "done" } }
+          );
+        }
+
+        // Atualize o status para "open" se o compromisso é futuro e o status é "done"
+        if (
+          appointment.date ||
+          (appointment.time > currentDate && appointment.status === "done")
+        ) {
+          await Appointment.updateMany(
+            { _id: appointment._id },
+            { $set: { status: "open" } }
+          );
+        }
+      }
 
       if (appointments.length === 0) {
         return res.status(404).json({ msg: "appointment not found" });
       }
-
-      return res.status(201).json(appointments); // Retorna os appointments encontrados
+      const updatedAppointments = await Appointment.find({ user: userId })
+        .sort({ createdAt: 1 })
+        .select("-__v")
+        .populate(
+          "user_obj",
+          "client_number first_name last_name email phone user_type"
+        )
+        .populate("invoice_obj", "invoice_url over_duo status");
+      res.status(201).json(updatedAppointments); // Retorna os appointments encontrados
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
