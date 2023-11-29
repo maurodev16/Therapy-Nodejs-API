@@ -83,8 +83,9 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
     // Atualize o status para "done" se o compromisso passou da data e da hora
     for (const appointment of appointments) {
       if (
-        appointment.date ||
-        (appointment.time < currentDate && appointment.status === "open")
+        appointment.date &&
+        appointment.time < currentDate &&
+        appointment.status === "open"
       ) {
         await Appointment.updateMany(
           { _id: appointment._id },
@@ -94,8 +95,9 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
 
       // Atualize o status para "open" se o compromisso é futuro e o status é "done"
       if (
-        appointment.date ||
-        (appointment.time > currentDate && appointment.status === "done")
+        appointment.date &&
+        appointment.time > currentDate &&
+        appointment.status === "done"
       ) {
         await Appointment.updateMany(
           { _id: appointment._id },
@@ -139,8 +141,9 @@ router.get(
       // Atualize o status para "done" se o compromisso passou da data e da hora
       for (const appointment of appointments) {
         if (
-          appointment.date ||
-          (appointment.time < currentDate && appointment.status === "open")
+          appointment.date &&
+          appointment.time < currentDate &&
+          appointment.status === "open"
         ) {
           await Appointment.updateMany(
             { _id: appointment._id },
@@ -150,8 +153,9 @@ router.get(
 
         // Atualize o status para "open" se o compromisso é futuro e o status é "done"
         if (
-          appointment.date ||
-          (appointment.time > currentDate && appointment.status === "done")
+          appointment.date &&
+          appointment.time > currentDate &&
+          appointment.status === "done"
         ) {
           await Appointment.updateMany(
             { _id: appointment._id },
