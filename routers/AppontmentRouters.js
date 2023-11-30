@@ -5,6 +5,7 @@ const User = require("../models/userSchema");
 const Appointment = require("../models/appointmentSchema");
 const checkToken = require("../middleware/checkToken");
 const Invoice = require("../models/invoiceSchema");
+const pushNotificationController = require("../controller/pussh_notification_controller");
 
 // Função para verificar a disponibilidade
 async function checkAvailability(date, time) {
@@ -22,7 +23,7 @@ async function checkAvailability(date, time) {
   }
 }
 // Rota para criar um novo agendamento
-router.post("/create-appointment", checkToken, async (req, res) => {
+router.post("/create-appointment", checkToken,pushNotificationController.sendPushNotificationToDashboard, async (req, res) => {
   try {
     ///Para criar um appoint, o
     const appointmentData = req.body;
@@ -54,6 +55,7 @@ router.post("/create-appointment", checkToken, async (req, res) => {
       });
 
       const newAppointment = await appointment.save();
+     
       res.status(200).json(newAppointment);
     } else {
       // Informa ao cliente que a date e hora não estão disponíveis
