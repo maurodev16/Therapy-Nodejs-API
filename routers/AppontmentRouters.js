@@ -231,4 +231,5 @@ router.post("/cancel-appointment/:appointmentId", async (req, res) => {
   }
 });
 
+
 export default router;
