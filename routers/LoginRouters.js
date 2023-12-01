@@ -1,10 +1,14 @@
-require("dotenv").config();
-const router = require("express").Router();
-const User = require("../models/userSchema");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const crypto = require("crypto");
-const mongoose = require("mongoose");
+import dotenv from "dotenv";
+import express from "express";
+import User from "../models/userSchema.js";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import crypto from "crypto";
+import mongoose from "mongoose";
+
+dotenv.config();
+const router = express.Router();
+
 const BCRYPT_SALT = process.env.BCRYPT_SALT;
 const AUTH_SECRET_KEY = process.env.AUTH_SECRET_KEY;
 
@@ -82,4 +86,4 @@ router.post("/login", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

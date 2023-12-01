@@ -1,4 +1,4 @@
-const multer = require('multer');
+import multer from 'multer';
 
 const storage = multer.diskStorage({
     filename: function (req, file, cb) {
@@ -25,4 +25,4 @@ const uploadSingleInvoice = multer({
     
 });
 
-module.exports = uploadSingleInvoice;
+export default  uploadSingleInvoice;

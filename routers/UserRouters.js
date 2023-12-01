@@ -1,7 +1,11 @@
-require("dotenv").config();
-const router = require("express").Router();
-const mongoose = require("mongoose");
-const User = require("../models/userSchema");
+import dotenv from "dotenv";
+import express from "express";
+import mongoose from "mongoose";
+import User from "../models/userSchema.js";
+
+dotenv.config();
+const router = express.Router();
+
 
 // CREATE (C)
 router.post("/create", async (req, res) => {
@@ -128,4 +132,4 @@ router.delete("/delete/:id", async (req, res) => {
 //   return requestingUser.isAdmin || requestingUser._id === targetUser._id;
 // }
 
-module.exports = router;
+export default router;

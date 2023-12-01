@@ -1,11 +1,15 @@
-require("dotenv").config();
-const router = require("express").Router();
-const mongoose = require("mongoose");
-const User = require("../models/userSchema");
-const Appointment = require("../models/appointmentSchema");
-const checkToken = require("../middleware/checkToken");
-const Invoice = require("../models/invoiceSchema");
-const pushNotificationController = require("../controller/pussh_notification_controller");
+import dotenv from "dotenv";
+import express from "express";
+import mongoose from "mongoose";
+import User from "../models/userSchema.js";
+import Appointment from "../models/appointmentSchema.js";
+import checkToken from "../middleware/checkToken.js";
+import Invoice from "../models/invoiceSchema.js";
+import pushNotificationController from "../controller/pussh_notification_controller.js";
+
+dotenv.config();
+const router = express.Router();
+
 
 // Função para verificar a disponibilidade
 async function checkAvailability(date, time) {
@@ -23,7 +27,7 @@ async function checkAvailability(date, time) {
   }
 }
 // Rota para criar um novo agendamento
-router.post("/create-appointment", checkToken,pushNotificationController.sendPushNotificationToDashboard, async (req, res) => {
+router.post("/create-appointment", checkToken, pushNotificationController.sendPushNotificationToDashboard, async (req, res) => {
   try {
     ///Para criar um appoint, o
     const appointmentData = req.body;
@@ -227,4 +231,4 @@ router.post("/cancel-appointment/:appointmentId", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

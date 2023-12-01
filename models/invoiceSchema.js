@@ -1,6 +1,7 @@
-const mongoose = require("mongoose");
-const User = require("./userSchema");
-const Appointment = require("./appointmentSchema");
+import mongoose from "mongoose";
+import User from "../models/userSchema.js";
+import Appointment from "../models/appointmentSchema.js";
+
 
 // Invoices Schema
 const invoiceSchema = new mongoose.Schema(
@@ -32,4 +33,4 @@ const invoiceSchema = new mongoose.Schema(
 // Documents
 const Invoice = mongoose.model("Invoice", invoiceSchema);
 
-module.exports = Invoice;
+export default  Invoice;

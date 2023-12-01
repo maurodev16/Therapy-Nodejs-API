@@ -1,11 +1,12 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const cloudinary = require("../services/cloudinaryConfig");
-const Invoice = require("../models/invoiceSchema");
-const User = require("../models/userSchema");
-const Appointment = require("../models/appointmentSchema");
-const uploadSingleInvoice = require("../middleware/multerSingleInvoiceMiddleware");
-const checkToken = require("../middleware/checkToken");
+import cloudinary from "../services/cloudinaryConfig.js";
+import Invoice from "../models/invoiceSchema.js";
+import User from "../models/userSchema.js";
+import Appointment from "../models/appointmentSchema.js";
+import uploadSingleInvoice from "../middleware/multerSingleInvoiceMiddleware.js";
+import checkToken from "../middleware/checkToken.js";
+
 
 // Rota para criar uma nova fatura
 router.post(
@@ -166,4 +167,4 @@ router.put("/update-invoice-status", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

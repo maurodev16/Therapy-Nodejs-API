@@ -1,5 +1,10 @@
-require('dotenv').config();
-const jwt = require('jsonwebtoken');
+import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
+
+dotenv.config();
+
+// The rest of your code using jwt and other dependencies...
+
 const AUTH_SECRET_KEY = process.env.AUTH_SECRET_KEY;
 
 // Middleware to check token
@@ -22,4 +27,4 @@ function checkToken(req, res, next) {
   });
 }
 
-module.exports =  checkToken;
+export default  checkToken;

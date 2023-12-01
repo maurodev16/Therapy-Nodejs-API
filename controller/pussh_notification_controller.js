@@ -1,6 +1,7 @@
-const admin = require("firebase-admin");
+import admin from "firebase-admin";
 
-exports.sendPushNotificationToDashboard = async (req, res, next) => {
+export default{
+  sendPushNotificationToDashboard: async (req, res, next) => {
   try {
     const appointmentData = req.body; // Use req.body para obter os dados do agendamento
 
@@ -23,4 +24,6 @@ exports.sendPushNotificationToDashboard = async (req, res, next) => {
     console.error("Error sending push notification:", error);
     res.status(500).json({ error: "Error sending push notification" });
   }
+}
+
 }

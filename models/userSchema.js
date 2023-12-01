@@ -1,8 +1,10 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-const Invoice = require("./invoiceSchema");
-const Appointment = require("./appointmentSchema");
-require("dotenv").config();
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import Invoice from "../models/invoiceSchema.js";
+import Appointment from "../models/appointmentSchema.js";
+import dotenv from "dotenv";
+dotenv.config();
+
 const bcryptSalt = process.env.BCRYPT_SALT;
 
 const userSchema = new mongoose.Schema(
@@ -50,4 +52,4 @@ userSchema.pre("save", async function (next) {
 
 const User = mongoose.model("User", userSchema);
 
-module.exports = User;
+export default User;

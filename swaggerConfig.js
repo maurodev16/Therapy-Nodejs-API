@@ -1,17 +1,16 @@
-const swaggerJsdoc = require('swagger-jsdoc');
+import swaggerJsdoc from 'swagger-jsdoc';
 
 const options = {
   swaggerDefinition: {
-    openapi: '3.0.0', // Especifique a versão do OpenAPI
+    openapi: '3.0.0',
     info: {
       title: 'Nome da API',
       version: '1.0.0',
       description: 'Descrição da API',
     },
   },
-  apis: ['./index.js'], // Especifique o caminho dos arquivos que contêm as definições de API
+  apis: ['./index.js'],
 };
 
-const specs = swaggerJsdoc(options);
-
-module.exports = specs;
+const swaggerSpec = swaggerJsdoc(options);
+export default swaggerSpec;

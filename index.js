@@ -1,25 +1,27 @@
-require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
-const bodyParser = require("body-parser");
-const cloudinary = require("cloudinary").v2;
-const swaggerUi = require("swagger-ui-express");
-const swaggerSpec = require("./swaggerConfig");
-const userRoutes = require("./routers/UserRouters");
-const loginRoutes = require("./routers/LoginRouters");
-const appointmentRoutes = require("./routers/AppontmentRouters");
-const invoiceRoutes = require("./routers/invoiceRouters");
-const admin = require("firebase-admin");
-process.env.GOOGLE_APPLICATION_CREDENTIALS; 
+import dotenv from "dotenv";
+dotenv.config();
+import express from "express";
+import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
+import bodyParser from "body-parser";
+import cloudinary from "cloudinary";
+cloudinary.v2;
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from './swaggerConfig.js';
+import userRoutes from "./routers/UserRouters.js";
+import loginRoutes from "./routers/LoginRouters.js";
+import appointmentRoutes from "./routers/AppontmentRouters.js";
+import invoiceRoutes from "./routers/invoiceRouters.js";
+import admin from "firebase-admin";
 import { initializeApp, applicationDefault } from "firebase-admin/app";
-const fs = require("fs");
+import fs from "fs";
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 initializeApp({
   credential: applicationDefault(),
-  projectId: 'terapy-projec'
+  projectId: "terapy-projec",
 });
 
 app.use(express.urlencoded({ extended: true }));

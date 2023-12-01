@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
 // Therapy Service type Schema
 const serviceSchema = new mongoose.Schema({
   name: { type: String },
@@ -9,4 +8,4 @@ const serviceSchema = new mongoose.Schema({
 // Therapy Service Type Model
 const ServiceType = mongoose.model("ServiceType", serviceSchema);
 
-module.exports = { ServiceType };
+export default  ServiceType ;
