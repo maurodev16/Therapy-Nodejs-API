@@ -12,16 +12,15 @@ import userRoutes from "./routers/UserRouters.js";
 import loginRoutes from "./routers/LoginRouters.js";
 import appointmentRoutes from "./routers/AppontmentRouters.js";
 import invoiceRoutes from "./routers/invoiceRouters.js";
-import admin from "firebase-admin";
-import { initializeApp, applicationDefault } from "firebase-admin/app";
+import {initializeApp,  applicationDefault } from "firebase-admin/app";
 import fs from "fs";
-
+process.env.GOOGLE_APPLICATION_CREDENTIALS;
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 initializeApp({
   credential: applicationDefault(),
-  projectId: "terapy-projec",
+ 
 });
 
 app.use(express.urlencoded({ extended: true }));
