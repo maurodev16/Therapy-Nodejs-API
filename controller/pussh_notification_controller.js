@@ -1,11 +1,4 @@
-// pussh_notification_controller.js
-
 const admin = require("firebase-admin");
-const pushNotificationJsonKeys = require("../services/push_notification_key.json");
-
-admin.initializeApp({
-  credential: admin.credential.cert(pushNotificationJsonKeys),
-});
 
 exports.sendPushNotificationToDashboard = async (req, res, next) => {
   try {
