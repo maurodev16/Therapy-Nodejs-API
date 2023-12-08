@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/maurodev16/therapy_API#readme",
   "dependencies": {
+    "@onesignal/node-onesignal": "^2.0.1-beta2",
     "accounting": "^0.4.1",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",

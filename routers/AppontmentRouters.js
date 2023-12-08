@@ -5,11 +5,10 @@ import User from "../models/userSchema.js";
 import Appointment from "../models/appointmentSchema.js";
 import checkToken from "../middleware/checkToken.js";
 import Invoice from "../models/invoiceSchema.js";
-import pushNotificationController from "../controller/pussh_notification_controller.js";
+import * as OneSignal from "@onesignal/node-onesignal";
 
 dotenv.config();
 const router = express.Router();
-
 
 // Função para verificar a disponibilidade
 async function checkAvailability(date, time) {
@@ -26,29 +25,51 @@ async function checkAvailability(date, time) {
     throw error; // Rejeita a promessa se ocorrer um erro
   }
 }
-// Rota para criar um novo agendamento
-router.post("/create-appointment", checkToken, pushNotificationController.sendPushNotificationToDashboard, async (req, res) => {
+// Função para enviar notificação OneSignal
+async function sendOneSignalNotification(appointmentData, userData) {
   try {
-    ///Para criar um appoint, o
-    const appointmentData = req.body;
+    const response = await fetch("https://onesignal.com/api/v1/notifications", {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${process.env.ONESIGNAL_API_CREDENTIAL}`,
+        "Content-Type": "application/json",
+      },
+      notification: OneSignal.Notification({}),
+      body: JSON.stringify({
+        app_id: process.env.ONESIGAL_APP_ID,
+        include_player_ids: [process.env.ONESIGNAL_include_player_ids],
+        contents: {
+          en: `Neuer Termin erstellt von: ${userData.first_name} ${userData.last_name}`,
+        },
+       
+        big_picture:
+          "https://res.cloudinary.com/dhkyslgft/image/upload/v1696606566/assets/no-data_favk5j.jpg",
+      }),
+    });
 
+    const responseData = await response.json();
+    console.log(responseData);
+  } catch (error) {
+    console.error("Error sending OneSignal notification:", error.message);
+  }
+}
+
+router.post("/create-appointment", checkToken, async (req, res) => {
+  try {
+    const appointmentData = req.body;
     const userId = req.auth._id;
-    console.log(userId);
 
     const user_obj = await User.findById(userId).select("-password");
-    console.log(user_obj);
     if (!user_obj) {
       return res.status(404).send("User not found");
     }
 
-    // Verifica se a date e hora estão disponíveis
     const isAvailable = await checkAvailability(
       appointmentData.date,
       appointmentData.time
     );
 
     if (isAvailable) {
-      // Cria o agendamento se estiver disponível
       const appointment = await Appointment({
         date: appointmentData.date,
         time: appointmentData.time,
@@ -59,10 +80,12 @@ router.post("/create-appointment", checkToken, pushNotificationController.sendPu
       });
 
       const newAppointment = await appointment.save();
-     
+
+      // Envie uma notificação para o usuário do dashboard
+      await sendOneSignalNotification(newAppointment, user_obj);
+
       res.status(200).json(newAppointment);
     } else {
-      // Informa ao cliente que a date e hora não estão disponíveis
       res.status(409).json({ DATA_END_TIME_NOT_AVAIABLE: isAvailable });
     }
   } catch (error) {
@@ -130,7 +153,6 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 //***************************************************************** */
 
@@ -230,6 +252,5 @@ router.post("/cancel-appointment/:appointmentId", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 export default router;
