@@ -6,7 +6,7 @@ import Appointment from "../models/appointmentSchema.js";
 import checkToken from "../middleware/checkToken.js";
 import Invoice from "../models/invoiceSchema.js";
 import * as OneSignal from "@onesignal/node-onesignal";
-
+import request from 'request';
 dotenv.config();
 const router = express.Router();
 
@@ -26,28 +26,80 @@ async function checkAvailability(date, time) {
   }
 }
 // Função para enviar notificação OneSignal
+
 async function sendOneSignalNotification(appointmentData, userData) {
+  const API_KEY = process.env.ONESIGNAL_API_CREDENTIAL;
+  const ONESIGNAL_APP_ID = process.env.ONESIGAL_APP_ID;
+  const BASE_URL = "https://onesignal.com/api/v1";
   try {
-    const response = await fetch("https://onesignal.com/api/v1/notifications", {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${process.env.ONESIGNAL_API_CREDENTIAL}`,
-        "Content-Type": "application/json",
-      },
-      notification: OneSignal.Notification({}),
-      body: JSON.stringify({
-        app_id: process.env.ONESIGAL_APP_ID,
-        include_player_ids: [process.env.ONESIGNAL_include_player_ids],
-        contents: {
-          en: `Neuer Termin erstellt von: ${userData.first_name} ${userData.last_name}`,
+    /**
+     * OPTIONS BUILDER
+     * @param {string} method
+     * @param {string} path
+     * @param {object} body
+     * @returns {object} options
+     */
+    const optionsBuilder = (method, path, body) => {
+      return {
+        method,
+        url: `${BASE_URL}/${path}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${API_KEY}`,
         },
+        body: body ? JSON.stringify(body) : null,
+      };
+    };
+    /**
+     * CREATE A PUSH NOTIFICATION
+     * method: POST
+     * Postman: https://www.postman.com/onesignaldevs/workspace/onesignal-api/request/16845437-c4f3498f-fd80-4304-a6c1-a3234b923f2c
+     * API Reference: https://documentation.onesignal.com/reference#create-notification
+     * path: /notifications
+     * @param {object} body
+     */
+    const createNotication = async (body) => {
+      const options = optionsBuilder("POST", "notifications", body);
+      console.log(options);
+      request(options, (error, response) => {
+        if (error) throw new Error(error);
+        console.log(response.body);
+        viewNotifcation(JSON.parse(response.body).id);
+      });
+    };
 
-        big_picture:
-          "https://res.cloudinary.com/dhkyslgft/image/upload/v1696606566/assets/no-data_favk5j.jpg",
-      }),
-    });
+    /**
+     * VIEW NOTIFICATION
+     * method: GET
+     * Postman: https://www.postman.com/onesignaldevs/workspace/onesignal-api/request/16845437-6c96ecf0-5882-4eac-a386-0d0cabc8ecd2
+     * API Reference: https://documentation.onesignal.com/reference#view-notification
+     * path: /notifications/{notification_id}?app_id=${ONE_SIGNAL_APP_ID}
+     * @param {string} notificationId
+     */
+    const viewNotifcation = (notificationId) => {
+      const path = `notifications/${notificationId}?app_id=${ONESIGNAL_APP_ID}`;
+      const options = optionsBuilder("GET", path);
+      request(options, (error, response) => {
+        if (error) throw new Error(error);
+        console.log(response.body);
+      });
+    };
+    const body = {
+      app_id: ONESIGNAL_APP_ID,
+      included_segments: ['All'],
 
-    const responseData = await response.json();
+      //include_player_ids: [],
+      data: {
+        foo: "bar",
+      },
+      contents: {
+        en: `Neuer Termin erstellt von: ${userData.first_name} ${userData.last_name}`,
+      },
+
+      big_picture:
+        "https://res.cloudinary.com/dhkyslgft/image/upload/v1696606566/assets/no-data_favk5j.jpg",
+    };
+    const responseData = await createNotication(body);
     console.log(responseData);
   } catch (error) {
     console.error("Error sending OneSignal notification:", error.message);
@@ -89,7 +141,6 @@ router.post("/create-appointment", checkToken, async (req, res) => {
       res.status(409).json({ DATA_END_TIME_NOT_AVAIABLE: isAvailable });
     }
   } catch (error) {
-    console.error("Error creating appointment:", error);
     res.status(500).send("ERROR_CREATE_APPOINT");
   }
 });
@@ -160,7 +211,7 @@ router.get(
   "/fetch-appointments-by-user/:user_id",
   checkToken,
   async (req, res) => {
-    const currentDate = Date.now;
+    const currentDate = new Date.now();
     try {
       const userId = req.params._id;
       const appointments = await Appointment.find({ user: userId })
