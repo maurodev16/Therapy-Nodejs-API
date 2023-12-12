@@ -148,7 +148,7 @@ router.post("/create-appointment", checkToken, async (req, res) => {
 router.get("/fetch-all-appointments", checkToken, async (req, res) => {
   try {
     // Use a consulta find com o campo indexado
-    const currentDate = new Date();
+    const currentDate = Date.now;
 
     // Recupere a lista atualizada de compromissos
     const appointments = await Appointment.find({})
