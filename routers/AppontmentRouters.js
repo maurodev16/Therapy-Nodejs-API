@@ -41,7 +41,7 @@ async function sendOneSignalNotification(appointmentData, userData) {
         contents: {
           en: `Neuer Termin erstellt von: ${userData.first_name} ${userData.last_name}`,
         },
-       
+
         big_picture:
           "https://res.cloudinary.com/dhkyslgft/image/upload/v1696606566/assets/no-data_favk5j.jpg",
       }),
@@ -160,6 +160,7 @@ router.get(
   "/fetch-appointments-by-user/:user_id",
   checkToken,
   async (req, res) => {
+    const currentDate = Date.now;
     try {
       const userId = req.params._id;
       const appointments = await Appointment.find({ user: userId })
@@ -171,6 +172,7 @@ router.get(
         )
         .populate("invoice_obj", "invoice_url over_duo status");
       // Atualize o status para "done" se o compromisso passou da data e da hora
+
       for (const appointment of appointments) {
         const appointmentDateTime = new Date(
           appointment.date.getFullYear(),
