@@ -211,7 +211,7 @@ router.get(
   "/fetch-appointments-by-user/:user_id",
   checkToken,
   async (req, res) => {
-    const currentDate = new Date.now();
+    const currentDate =  Date.now;
     try {
       const userId = req.params._id;
       const appointments = await Appointment.find({ user: userId })
