@@ -21,7 +21,7 @@ const invoiceSchema = new mongoose.Schema(
     create_by: { type: String },
     status: {
       type: String,
-      enum: ["open", "pending", "completed", "overduo"],
+      enum: ["open", "paid", "refunded", "overduo"],
       default: "open",
     },
   },
