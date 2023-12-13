@@ -111,7 +111,7 @@ router.get("/fetch-invoices", async (req, res) => {
       .sort({ over_due: 1 })
       .select("-__v")
       .populate("user_obj", "client_number first_name last_name email phone")
-      .populate("appointment_obj", "_id date time status canceled_by");
+      .populate("appointment_obj", "_id");
 
     for (const invoice of invoices) {
       if (invoice.over_duo < currentDate && invoice.status === "open") {
@@ -159,7 +159,7 @@ router.get("/fetch-invoices", async (req, res) => {
       .sort({ over_due: 1 })
       .select("-__v")
       .populate("user_obj", "client_number first_name last_name email phone")
-      .populate("appointment_obj", "_id date time status canceled_by");
+      .populate("appointment_obj", "_id");
 
     res.status(200).json(updatedInvoices);
   } catch (error) {
