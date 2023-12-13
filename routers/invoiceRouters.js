@@ -104,7 +104,7 @@ router.post(
 // Rota para obter e atualizar o status das faturas com base nas datas
 router.get("/fetch-invoices", async (req, res) => {
   try {
-    const currentDate = Date.now;
+    const currentDate = Date.now();
 
     // Encontre todas as faturas
     const invoices = await Invoice.find({})
@@ -114,7 +114,7 @@ router.get("/fetch-invoices", async (req, res) => {
 
     for (const invoice of invoices) {
       if (invoice.over_duo < currentDate && invoice.status === "open") {
-        await Invoice.updateMany(
+        await Invoice.updateOne(
           { _id: invoice._id },
           { $set: { status: "overduo" } }
         );
@@ -136,17 +136,17 @@ router.get("/fetch-invoices", async (req, res) => {
 // Rota para atualizar o status das faturas com base nas datas
 router.put("/update-invoice-status", async (req, res) => {
   try {
-    const currentDate =  Date.now;
+    const currentDate =  Date.now();
 
     // Encontre todas as faturas
     const invoices = await Invoice.find({}).sort({ over_due: 1 });
 
-    // Atualize o status para "completed" se a fatura estiver vencida
+    // Atualize o status para "overduo" se a fatura estiver vencida e com o status OPEN
     for (const invoice of invoices) {
-      if (invoice.over_due < currentDate && invoice.status !== "completed") {
+      if (invoice.over_due < currentDate && invoice.status !== "open") {
         await Invoice.updateOne(
           { _id: invoice._id },
-          { $set: { status: "completed" } }
+          { $set: { status: "overduo" } }
         );
       }
     }
