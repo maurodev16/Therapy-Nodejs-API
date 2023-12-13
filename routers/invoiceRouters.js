@@ -120,7 +120,39 @@ router.get("/fetch-invoices", async (req, res) => {
         );
       }
     }
-
+    for (const invoice of invoices) {
+      if (invoice.over_duo < currentDate && invoice.status === "paid") {
+        await Invoice.updateOne(
+          { _id: invoice._id },
+          { $set: { status: "paid" } }
+        );
+      }
+    }
+    for (const invoice of invoices) {
+      if (invoice.over_duo > currentDate && invoice.status === "paid") {
+        await Invoice.updateOne(
+          { _id: invoice._id },
+          { $set: { status: "paid" } }
+        );
+      }
+    }
+    for (const invoice of invoices) {
+      if (invoice.over_duo < currentDate && invoice.status === "refunded") {
+        await Invoice.updateOne(
+          { _id: invoice._id },
+          { $set: { status: "refunded" } }
+        );
+      }
+    }
+    for (const invoice of invoices) {
+      if (invoice.over_duo > currentDate && invoice.status === "refunded") {
+        await Invoice.updateOne(
+          { _id: invoice._id },
+          { $set: { status: "refunded" } }
+        );
+      }
+    }
+   
     // Recupere a lista atualizada de faturas após as atualizações
     const updatedInvoices = await Invoice.find({})
       .sort({ over_due: 1 })
