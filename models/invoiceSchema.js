@@ -22,7 +22,7 @@ const invoiceSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["open", "paid", "refunded", "overduo"],
-   
+      default: "open",
     },
   },
   {
