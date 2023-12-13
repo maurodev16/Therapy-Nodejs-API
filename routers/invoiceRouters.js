@@ -105,8 +105,6 @@ router.post(
 router.get("/fetch-invoices", async (req, res) => {
   try {
     const currentDate = Date.now();
-
-    // Encontre todas as faturas
     const invoices = await Invoice.find({})
       .sort({ over_due: 1 })
       .select("-__v")
@@ -114,47 +112,34 @@ router.get("/fetch-invoices", async (req, res) => {
       .populate("appointment_obj", "status");
 
     for (const invoice of invoices) {
-      if (invoice.over_duo < currentDate && invoice.status === "open") {
-        await Invoice.updateOne(
-          { _id: invoice._id },
-          { $set: { status: "overduo" } }
-        );
+      switch (invoice.status) {
+        case "open":
+          if (invoice.over_duo < currentDate && invoice.status =="open") {
+            await updateInvoiceStatus(invoice._id, "overduo");
+          }
+          break;
+
+        // case "paid":
+        //   if (invoice.over_duo < currentDate && invoice.status =="open") {
+        //     await updateInvoiceStatus(invoice._id, "paid");
+        //   } else {
+        //     await updateInvoiceStatus(invoice._id, "paid");
+        //   }
+        //   break;
+
+        // case "refunded":
+        //   if (invoice.over_duo < currentDate) {
+        //     await updateInvoiceStatus(invoice._id, "refunded");
+        //   } else {
+        //     await updateInvoiceStatus(invoice._id, "refunded");
+        //   }
+        //   break;
+
+        default:
+          // Lógica para lidar com outros status, se necessário
       }
     }
-    for (const invoice of invoices) {
-      if (invoice.over_duo < currentDate && invoice.status === "paid") {
-        await Invoice.updateOne(
-          { _id: invoice._id },
-          { $set: { status: "paid" } }
-        );
-      }
-    }
-    for (const invoice of invoices) {
-      if (invoice.over_duo > currentDate && invoice.status === "paid") {
-        await Invoice.updateOne(
-          { _id: invoice._id },
-          { $set: { status: "paid" } }
-        );
-      }
-    }
-    for (const invoice of invoices) {
-      if (invoice.over_duo < currentDate && invoice.status === "refunded") {
-        await Invoice.updateOne(
-          { _id: invoice._id },
-          { $set: { status: "refunded" } }
-        );
-      }
-    }
-    for (const invoice of invoices) {
-      if (invoice.over_duo > currentDate && invoice.status === "refunded") {
-        await Invoice.updateOne(
-          { _id: invoice._id },
-          { $set: { status: "refunded" } }
-        );
-      }
-    }
-   
-    // Recupere a lista atualizada de faturas após as atualizações
+
     const updatedInvoices = await Invoice.find({})
       .sort({ over_due: 1 })
       .select("-__v")
@@ -166,6 +151,11 @@ router.get("/fetch-invoices", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+async function updateInvoiceStatus(invoiceId, newStatus) {
+  await Invoice.updateOne({ _id: invoiceId }, { $set: { status: newStatus } });
+}
+
 
 // Rota para atualizar o status das faturas com base nas datas
 router.put("/update-invoice-status", async (req, res) => {
