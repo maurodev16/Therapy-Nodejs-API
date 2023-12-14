@@ -52,15 +52,12 @@ router.post(
       }
 
       const file = req.file;
-      const public_id = `${appointment._id}-${appointment.user_obj}-${
-        file.originalname.split(".")[0]
-      }`;
-
+      const invoice_name = `${file.originalname.split(".")[0]}`;
       console.log(file);
       const result = await cloudinary.uploader.upload(file.path, {
         resource_type: "raw",
         allowedFormats: ["jpg", "png", "pdf"],
-        public_id: public_id,
+        public_id: invoice_name,
         overwrite: false,
         upload_preset: "wasGehtAb_preset",
       });
@@ -72,6 +69,7 @@ router.post(
       // Cria a fatura no schema Invoice
       const invoice = new Invoice({
         invoice_url: result.secure_url,
+        invoice_name: invoice_name,
         user_obj: appointment.user_obj,
         appointment_obj: appointment._id,
         over_duo: invoiceData.over_duo,
@@ -152,7 +150,7 @@ router.get("/fetch-invoices", async (req, res) => {
 
     res.status(200).json(updatedInvoices);
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ msg: "Internal Server Error" });
   }
 });
 
@@ -206,7 +204,7 @@ router.get("/fetch-invoices-by-user-id/:user_id", async (req, res) => {
 
     res.status(200).json(updatedInvoices);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ msg: error.message });
   }
 });
 

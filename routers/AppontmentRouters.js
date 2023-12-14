@@ -274,34 +274,42 @@ router.get(
   }
 );
 
-router.post("/cancel-appointment/:appointmentId", async (req, res) => {
+router.patch("/cancel-appointment/:appointmentId",checkToken, async (req, res) => {
   const appointmentId = req.params.appointmentId;
-  const user_id = req.body.user_id; // Certifique-se de pegar o campo correto do corpo da solicitação
+  const user_id = req.body.user_id; 
 
   try {
-    // Verifique se o compromisso existe
-    const appointment = await Appointment.findById(appointmentId);
-
-    if (!appointment) {
-      return res.status(404).json({ error: "Appointment not found" });
+    const user = await User.findById(user_id);
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
     }
 
+    // Verifique se o compromisso existe
+    const appointment = await Appointment.findById(appointmentId);
+  if (!appointment) {
+      return res.status(404).json({ msg: "Appointment not found" });
+    }
+
+    if (appointment.status === "canceled") {
+      return res.status(403).json({ msg: "Appointment has already been canceled" });
+    }
+  
     // Verifique se o usuário é o proprietário do compromisso ou é um administrador
     if (
-      appointment.user_obj.equals(user_id) || user_id.user_type ==="admin"
+      appointment.user_obj.equals(user._id) || user.user_type ==="admin"
     ) {
       // Atualize o status para "canceled" e registre quem cancelou
       appointment.status = "canceled";
-      appointment.canceled_by = user_id;
+      appointment.canceled_by = user._id;
       await appointment.save();
 
-      res.status(200).json(appointment);
+      res.status(200).json({msg:`${appointment.status}`});
     } else {
-      res.status(403).json({ error: "Permission denied" });
+      res.status(403).json({ msg: "Permission denied" });
     }
   } catch (error) {
     console.error("Error canceling appointment:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ msg: "Internal Server Error" });
   }
 });
 

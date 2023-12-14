@@ -43,6 +43,7 @@
     "mongoose-sequence": "^5.3.1",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.7",
+    "onesignal-node": "^3.4.0",
     "request": "^2.88.2",
     "sass": "^1.69.5",
     "socket.io": "^4.7.2",

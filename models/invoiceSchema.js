@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import User from "../models/userSchema.js";
 import Appointment from "../models/appointmentSchema.js";
 
-
 // Invoices Schema
 const invoiceSchema = new mongoose.Schema(
   {
@@ -17,6 +16,7 @@ const invoiceSchema = new mongoose.Schema(
       required: true,
     },
     invoice_url: { type: String },
+    invoice_name: { type: String },
     over_duo: { type: Date },
     create_by: { type: String },
     status: {
@@ -33,4 +33,4 @@ const invoiceSchema = new mongoose.Schema(
 // Documents
 const Invoice = mongoose.model("Invoice", invoiceSchema);
 
-export default  Invoice;
+export default Invoice;
