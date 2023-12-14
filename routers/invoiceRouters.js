@@ -220,11 +220,31 @@ router.put("/update-invoice-status", async (req, res) => {
 
     // Atualize o status para "overduo" se a fatura estiver vencida e com o status OPEN
     for (const invoice of invoices) {
-      if (invoice.over_due < currentDate && invoice.status !== "open") {
-        await Invoice.updateOne(
-          { _id: invoice._id },
-          { $set: { status: "overduo" } }
-        );
+      switch (invoice.status) {
+        case "open":
+          if (invoice.over_duo < currentDate && invoice.status =="open") {
+            await updateInvoiceStatus(invoice._id, "overduo");
+          }
+          break;
+
+        // case "paid":
+        //   if (invoice.over_duo < currentDate && invoice.status =="open") {
+        //     await updateInvoiceStatus(invoice._id, "paid");
+        //   } else {
+        //     await updateInvoiceStatus(invoice._id, "paid");
+        //   }
+        //   break;
+
+        // case "refunded":
+        //   if (invoice.over_duo < currentDate) {
+        //     await updateInvoiceStatus(invoice._id, "refunded");
+        //   } else {
+        //     await updateInvoiceStatus(invoice._id, "refunded");
+        //   }
+        //   break;
+
+        default:
+          // Lógica para lidar com outros status, se necessário
       }
     }
 
