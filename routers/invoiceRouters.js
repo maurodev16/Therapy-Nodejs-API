@@ -157,7 +157,7 @@ async function updateInvoiceStatus(invoiceId, newStatus) {
 }
 
 // Fetch Invoices by user Id
-router.get("/fetch-invoices/:user_id", async (req, res) => {
+router.get("/fetch-invoices-by-user-id/:user_id", async (req, res) => {
   try {
     const currentDate = Date.now();
     const userId = req.params._id;
