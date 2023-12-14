@@ -7,6 +7,10 @@ import Appointment from "../models/appointmentSchema.js";
 import uploadSingleInvoice from "../middleware/multerSingleInvoiceMiddleware.js";
 import checkToken from "../middleware/checkToken.js";
 
+//HELPER FUNCTION TO UPDATE INVOICE STATUS
+async function updateInvoiceStatus(invoiceId, newStatus) {
+  await Invoice.updateOne({ _id: invoiceId }, { $set: { status: newStatus } });
+}
 
 // Rota para criar uma nova fatura
 router.post(
@@ -152,9 +156,7 @@ router.get("/fetch-invoices", async (req, res) => {
   }
 });
 
-async function updateInvoiceStatus(invoiceId, newStatus) {
-  await Invoice.updateOne({ _id: invoiceId }, { $set: { status: newStatus } });
-}
+
 
 // Fetch Invoices by user Id
 router.get("/fetch-invoices-by-user-id/:user_id", async (req, res) => {
@@ -207,11 +209,6 @@ router.get("/fetch-invoices-by-user-id/:user_id", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-async function updateInvoiceStatus(invoiceId, newStatus) {
-  await Invoice.updateOne({ _id: invoiceId }, { $set: { status: newStatus } });
-}
-
 
 // Rota para atualizar o status das faturas com base nas datas
 router.put("/update-invoice-status", async (req, res) => {
