@@ -288,7 +288,7 @@ router.post("/cancel-appointment/:appointmentId", async (req, res) => {
 
     // Verifique se o usuário é o proprietário do compromisso ou é um administrador
     if (
-      appointment.user_obj.equals(user_id) || user_id.user_type =="admin"
+      appointment.user_obj.equals(user_id) || user_id.user_type ==="admin"
     ) {
       // Atualize o status para "canceled" e registre quem cancelou
       appointment.status = "canceled";
