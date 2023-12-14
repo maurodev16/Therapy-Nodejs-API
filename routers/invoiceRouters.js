@@ -156,6 +156,62 @@ async function updateInvoiceStatus(invoiceId, newStatus) {
   await Invoice.updateOne({ _id: invoiceId }, { $set: { status: newStatus } });
 }
 
+// Fetch Invoices by user Id
+router.get("/fetch-invoices/:user_id", async (req, res) => {
+  try {
+    const currentDate = Date.now();
+    const userId = req.params._id;
+    const invoices = await Invoice.find({ user: userId })
+      .sort({ over_due: 1 })
+      .select("-__v")
+      .populate("user_obj", "client_number first_name last_name email phone")
+      .populate("appointment_obj", "status");
+
+    for (const invoice of invoices) {
+      switch (invoice.status) {
+        case "open":
+          if (invoice.over_duo < currentDate && invoice.status =="open") {
+            await updateInvoiceStatus(invoice._id, "overduo");
+          }
+          break;
+
+        // case "paid":
+        //   if (invoice.over_duo < currentDate && invoice.status =="open") {
+        //     await updateInvoiceStatus(invoice._id, "paid");
+        //   } else {
+        //     await updateInvoiceStatus(invoice._id, "paid");
+        //   }
+        //   break;
+
+        // case "refunded":
+        //   if (invoice.over_duo < currentDate) {
+        //     await updateInvoiceStatus(invoice._id, "refunded");
+        //   } else {
+        //     await updateInvoiceStatus(invoice._id, "refunded");
+        //   }
+        //   break;
+
+        default:
+          // Lógica para lidar com outros status, se necessário
+      }
+    }
+
+    const updatedInvoices = await Invoice.find({user: userId})
+      .sort({ over_due: 1 })
+      .select("-__v")
+      .populate("user_obj", "client_number first_name last_name email phone")
+      .populate("appointment_obj", "status");
+
+    res.status(200).json(updatedInvoices);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+async function updateInvoiceStatus(invoiceId, newStatus) {
+  await Invoice.updateOne({ _id: invoiceId }, { $set: { status: newStatus } });
+}
+
 
 // Rota para atualizar o status das faturas com base nas datas
 router.put("/update-invoice-status", async (req, res) => {
