@@ -130,7 +130,7 @@ router.post("/create-appointment", checkToken, async (req, res) => {
         user_obj: user_obj,
         status: appointmentData.status,
       });
-
+console.log(appointment)
       const newAppointment = await appointment.save();
 
       // Envie uma notificação para o usuário do dashboard
@@ -141,7 +141,9 @@ router.post("/create-appointment", checkToken, async (req, res) => {
       res.status(409).json({ DATA_END_TIME_NOT_AVAIABLE: isAvailable });
     }
   } catch (error) {
-    res.status(500).send("ERROR_CREATE_APPOINT");
+console.log(error)
+
+    res.status(500).json({error:"ERROR_CREATE_APPOINT"});
   }
 });
 
