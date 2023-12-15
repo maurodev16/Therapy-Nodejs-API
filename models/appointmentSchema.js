@@ -19,7 +19,7 @@ const appointmentSchema = new mongoose.Schema(
       required: true,
     },
     service_type_obj: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "ServiceType", default: [] },
+      { type: mongoose.Schema.Types.ObjectId, ref: "ServiceType",  default: {}, },
     ],
     status: {
       type: String,
@@ -27,9 +27,7 @@ const appointmentSchema = new mongoose.Schema(
       default: "open",
     },
     canceled_by: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
+      type: mongoose.Schema.Types.ObjectId, ref: "User", default: {},  },
   },
   {
     timestamps: true,
