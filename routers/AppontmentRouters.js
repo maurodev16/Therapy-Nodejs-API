@@ -182,13 +182,13 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
         );
       }
 
-      // Atualize o status para "open" se o compromisso é futuro e o status é "done"
-      if (appointmentDateTime > currentDate && appointment.status === "done") {
-        await Appointment.updateOne(
-          { _id: appointment._id },
-          { $set: { status: "open" } }
-        );
-      }
+      // // Atualize o status para "open" se o compromisso é futuro e o status é "done"
+      // if (appointmentDateTime > currentDate && appointment.status === "done") {
+      //   await Appointment.updateOne(
+      //     { _id: appointment._id },
+      //     { $set: { status: "open" } }
+      //   );
+      // }
     }
 
     // Recupere a lista atualizada de compromissos após as atualizações
