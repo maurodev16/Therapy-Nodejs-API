@@ -150,16 +150,13 @@ console.log(error)
 router.get("/fetch-all-appointments", checkToken, async (req, res) => {
   try {
     // Use a consulta find com o campo indexado
-    const currentDate = Date.now;
+    const currentDate = Date.now();
 
     // Recupere a lista atualizada de compromissos
     const appointments = await Appointment.find({})
       .sort({ date: 1 })
       .select("-__v")
-      .populate(
-        "user_obj",
-        "client_number first_name last_name email phone user_type"
-      )
+      .populate( "user_obj", "client_number first_name last_name email phone user_type")
       .populate("invoice_obj", "invoice_url over_duo status");
 
     // Atualize o status com base na data e hora de cada compromisso
@@ -182,13 +179,13 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
         );
       }
 
-      // // Atualize o status para "open" se o compromisso é futuro e o status é "done"
-      // if (appointmentDateTime > currentDate && appointment.status === "done") {
-      //   await Appointment.updateOne(
-      //     { _id: appointment._id },
-      //     { $set: { status: "open" } }
-      //   );
-      // }
+      // Atualize o status para "open" se o compromisso é futuro e o status é "done"
+      if (appointmentDateTime > currentDate && appointment.status === "done") {
+        await Appointment.updateOne(
+          { _id: appointment._id },
+          { $set: { status: "open" } }
+        );
+      }
     }
 
     // Recupere a lista atualizada de compromissos após as atualizações
@@ -213,7 +210,7 @@ router.get(
   "/fetch-appointments-by-user/:user_id",
   checkToken,
   async (req, res) => {
-    const currentDate =  Date.now;
+    const currentDate =  Date.now();
     try {
       const userId = req.params._id;
       const appointments = await Appointment.find({ user: userId })

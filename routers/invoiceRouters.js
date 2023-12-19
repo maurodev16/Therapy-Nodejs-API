@@ -104,7 +104,7 @@ router.post(
 );
 
 // Rota para obter e atualizar o status das faturas com base nas datas
-router.get("/fetch-invoices", async (req, res) => {
+router.get("/fetch-invoices",checkToken, async (req, res) => {
   try {
     const currentDate = Date.now();
     const invoices = await Invoice.find({})
