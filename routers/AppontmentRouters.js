@@ -302,8 +302,8 @@ router.patch("/cancel-appointment/:appointmentId",checkToken, async (req, res) =
       appointment.canceled_by = user._id;
       await appointment.save();
 
-      
-      res.status(200).json({msg:`${appointment.status}`});
+
+      res.status(200).send(appointment);
     } else {
       res.status(403).json({ msg: "Permission denied" });
     }
