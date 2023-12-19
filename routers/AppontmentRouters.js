@@ -130,7 +130,7 @@ router.post("/create-appointment", checkToken, async (req, res) => {
         user_obj: user_obj,
         status: appointmentData.status,
       });
-console.log(appointment)
+      console.log(appointment)
       const newAppointment = await appointment.save();
 
       // Envie uma notificação para o usuário do dashboard
@@ -299,7 +299,7 @@ router.patch("/cancel-appointment/:appointmentId",checkToken, async (req, res) =
     ) {
       // Atualize o status para "canceled" e registre quem cancelou
       appointment.status = "canceled";
-      appointment.canceled_by = user._id;
+      appointment.canceled_by = `${user.first_name} ${user.last_name}`;
       await appointment.save();
 
 
