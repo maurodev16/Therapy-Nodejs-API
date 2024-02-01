@@ -7,38 +7,31 @@ import checkToken from "../middleware/checkToken.js";
 import Invoice from "../models/invoiceSchema.js";
 import * as OneSignal from "@onesignal/node-onesignal";
 import request from 'request';
+
 dotenv.config();
 const router = express.Router();
 
-// Função para verificar a disponibilidade
+// Function to check availability of appointment date and time
 async function checkAvailability(date, time) {
   try {
-    // Consulta o banco de dados para verificar se a date e hora já foram reservadas
+    // Query the database to check if the date and time are already booked
     const existingAppointment = await Appointment.findOne({ date, time });
-    console.log(date);
-    console.log(time);
 
-    // Retorna verdadeiro se estiver disponível, falso se já estiver reservado
+    // Return true if available, false if already booked
     return !existingAppointment;
   } catch (error) {
     console.error("Error checking availability:", error);
-    throw error; // Rejeita a promessa se ocorrer um erro
+    throw error;
   }
 }
-// Função para enviar notificação OneSignal
 
+// Function to send OneSignal notification
 async function sendOneSignalNotification(appointmentData, userData) {
   const API_KEY = process.env.ONESIGNAL_API_CREDENTIAL;
   const ONESIGNAL_APP_ID = process.env.ONESIGAL_APP_ID;
   const BASE_URL = "https://onesignal.com/api/v1";
+
   try {
-    /**
-     * OPTIONS BUILDER
-     * @param {string} method
-     * @param {string} path
-     * @param {object} body
-     * @returns {object} options
-     */
     const optionsBuilder = (method, path, body) => {
       return {
         method,
@@ -50,17 +43,9 @@ async function sendOneSignalNotification(appointmentData, userData) {
         body: body ? JSON.stringify(body) : null,
       };
     };
-    /**
-     * CREATE A PUSH NOTIFICATION
-     * method: POST
-     * Postman: https://www.postman.com/onesignaldevs/workspace/onesignal-api/request/16845437-c4f3498f-fd80-4304-a6c1-a3234b923f2c
-     * API Reference: https://documentation.onesignal.com/reference#create-notification
-     * path: /notifications
-     * @param {object} body
-     */
+
     const createNotication = async (body) => {
       const options = optionsBuilder("POST", "notifications", body);
-      console.log(options);
       request(options, (error, response) => {
         if (error) throw new Error(error);
         console.log(response.body);
@@ -68,14 +53,6 @@ async function sendOneSignalNotification(appointmentData, userData) {
       });
     };
 
-    /**
-     * VIEW NOTIFICATION
-     * method: GET
-     * Postman: https://www.postman.com/onesignaldevs/workspace/onesignal-api/request/16845437-6c96ecf0-5882-4eac-a386-0d0cabc8ecd2
-     * API Reference: https://documentation.onesignal.com/reference#view-notification
-     * path: /notifications/{notification_id}?app_id=${ONE_SIGNAL_APP_ID}
-     * @param {string} notificationId
-     */
     const viewNotifcation = (notificationId) => {
       const path = `notifications/${notificationId}?app_id=${ONESIGNAL_APP_ID}`;
       const options = optionsBuilder("GET", path);
@@ -84,20 +61,17 @@ async function sendOneSignalNotification(appointmentData, userData) {
         console.log(response.body);
       });
     };
+
     const body = {
       app_id: ONESIGNAL_APP_ID,
       included_segments: ['All'],
-
-      //include_player_ids: [],
       data: {
         foo: "bar",
       },
       contents: {
-        en: `Neuer Termin erstellt von: ${userData.first_name} ${userData.last_name}`,
+        en: `New appointment created by: ${userData.first_name} ${userData.last_name}`,
       },
-
-      big_picture:
-        "https://res.cloudinary.com/dhkyslgft/image/upload/v1696606566/assets/no-data_favk5j.jpg",
+      big_picture: "https://res.cloudinary.com/dhkyslgft/image/upload/v1696606566/assets/no-data_favk5j.jpg",
     };
     const responseData = await createNotication(body);
     console.log(responseData);
@@ -106,6 +80,7 @@ async function sendOneSignalNotification(appointmentData, userData) {
   }
 }
 
+// Route to create an appointment
 router.post("/create-appointment", checkToken, async (req, res) => {
   try {
     const appointmentData = req.body;
@@ -130,10 +105,10 @@ router.post("/create-appointment", checkToken, async (req, res) => {
         user_obj: user_obj,
         status: appointmentData.status,
       });
-      console.log(appointment)
+
       const newAppointment = await appointment.save();
 
-      // Envie uma notificação para o usuário do dashboard
+      // Send a notification to the user from the dashboard
       await sendOneSignalNotification(newAppointment, user_obj);
 
       res.status(200).json(newAppointment);
@@ -141,25 +116,24 @@ router.post("/create-appointment", checkToken, async (req, res) => {
       res.status(409).json({ DATA_END_TIME_NOT_AVAIABLE: isAvailable });
     }
   } catch (error) {
-console.log(error)
-
-    res.status(500).json({error:"ERROR_CREATE_APPOINT"});
+    console.error(error);
+    res.status(500).json({ error: "ERROR_CREATE_APPOINT" });
   }
 });
 
+// Route to fetch all appointments
 router.get("/fetch-all-appointments", checkToken, async (req, res) => {
   try {
-    // Use a consulta find com o campo indexado
     const currentDate = Date.now();
 
-    // Recupere a lista atualizada de compromissos
+    // Retrieve the updated list of appointments
     const appointments = await Appointment.find({})
       .sort({ date: 1 })
       .select("-__v")
-      .populate( "user_obj", "client_number first_name last_name email phone user_type")
+      .populate("user_obj", "client_number first_name last_name email phone user_type")
       .populate("invoice_obj", "invoice_url over_duo status");
 
-    // Atualize o status com base na data e hora de cada compromisso
+    // Update status based on date and time for each appointment
     for (const appointment of appointments) {
       const appointmentDateTime = new Date(
         appointment.date.getFullYear(),
@@ -171,7 +145,7 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
         0
       );
 
-      // Atualize o status para "done" se o compromisso passou da data e da hora
+      // Update status to "done" if the appointment has passed its date and time
       if (appointmentDateTime < currentDate && appointment.status === "open") {
         await Appointment.updateOne(
           { _id: appointment._id },
@@ -179,7 +153,7 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
         );
       }
 
-      // Atualize o status para "open" se o compromisso é futuro e o status é "done"
+      // Update status to "open" if the appointment is in the future and status is "done"
       if (appointmentDateTime > currentDate && appointment.status === "done") {
         await Appointment.updateOne(
           { _id: appointment._id },
@@ -188,14 +162,11 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
       }
     }
 
-    // Recupere a lista atualizada de compromissos após as atualizações
+    // Retrieve the updated list of appointments after updates
     const updatedAppointments = await Appointment.find({})
       .sort({ date: 1 })
       .select("-__v")
-      .populate(
-        "user_obj",
-        "client_number first_name last_name email phone user_type"
-      )
+      .populate("user_obj", "client_number first_name last_name email phone user_type")
       .populate("invoice_obj", "invoice_url over_duo status");
 
     res.status(200).json(updatedAppointments);
@@ -204,76 +175,60 @@ router.get("/fetch-all-appointments", checkToken, async (req, res) => {
   }
 });
 
-//***************************************************************** */
+// Route to fetch appointments by user ID
+router.get("/fetch-appointments-by-user/:user_id", checkToken, async (req, res) => {
+  const currentDate = Date.now();
+  try {
+    const userId = req.params._id;
+    const appointments = await Appointment.find({ user: userId })
+      .sort({ createdAt: 1 })
+      .select("-__v")
+      .populate("user_obj", "client_number first_name last_name email phone user_type")
+      .populate("invoice_obj", "invoice_url over_duo status");
 
-router.get(
-  "/fetch-appointments-by-user/:user_id",
-  checkToken,
-  async (req, res) => {
-    const currentDate =  Date.now();
-    try {
-      const userId = req.params._id;
-      const appointments = await Appointment.find({ user: userId })
-        .sort({ createdAt: 1 })
-        .select("-__v")
-        .populate(
-          "user_obj",
-          "client_number first_name last_name email phone user_type"
-        )
-        .populate("invoice_obj", "invoice_url over_duo status");
-      // Atualize o status para "done" se o compromisso passou da data e da hora
-
-      for (const appointment of appointments) {
-        const appointmentDateTime = new Date(
-          appointment.date.getFullYear(),
-          appointment.date.getMonth(),
-          appointment.date.getDate(),
-          appointment.time.getHours(),
-          appointment.time.getMinutes(),
-          0,
-          0
+    // Update status to "done" if the appointment has passed its date and time
+    for (const appointment of appointments) {
+      const appointmentDateTime = new Date(
+        appointment.date.getFullYear(),
+        appointment.date.getMonth(),
+        appointment.date.getDate(),
+        appointment.time.getHours(),
+        appointment.time.getMinutes(),
+        0,
+        0
+      );
+      if (appointmentDateTime < currentDate && appointment.status === "open") {
+        await Appointment.updateMany(
+          { _id: appointment._id },
+          { $set: { status: "done" } }
         );
-        if (
-          appointmentDateTime < currentDate &&
-          appointment.status === "open"
-        ) {
-          await Appointment.updateMany(
-            { _id: appointment._id },
-            { $set: { status: "done" } }
-          );
-        }
-
-        // Atualize o status para "open" se o compromisso é futuro e o status é "done"
-        if (
-          appointmentDateTime > currentDate &&
-          appointment.status === "done"
-        ) {
-          await Appointment.updateMany(
-            { _id: appointment._id },
-            { $set: { status: "open" } }
-          );
-        }
       }
 
-      if (appointments.length === 0) {
-        return res.status(404).json({ msg: "appointment not found" });
+      // Update status to "open" if the appointment is in the future and status is "done"
+      if (appointmentDateTime > currentDate && appointment.status === "done") {
+        await Appointment.updateMany(
+          { _id: appointment._id },
+          { $set: { status: "open" } }
+        );
       }
-      const updatedAppointments = await Appointment.find({ user: userId })
-        .sort({ createdAt: 1 })
-        .select("-__v")
-        .populate(
-          "user_obj",
-          "client_number first_name last_name email phone user_type"
-        )
-        .populate("invoice_obj", "invoice_url over_duo status");
-      res.status(201).json(updatedAppointments); // Retorna os appointments encontrados
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
     }
-  }
-);
 
-router.patch("/cancel-appointment/:appointmentId",checkToken, async (req, res) => {
+    if (appointments.length === 0) {
+      return res.status(404).json({ msg: "appointment not found" });
+    }
+    const updatedAppointments = await Appointment.find({ user: userId })
+      .sort({ createdAt: 1 })
+      .select("-__v")
+      .populate("user_obj", "client_number first_name last_name email phone user_type")
+      .populate("invoice_obj", "invoice_url over_duo status");
+    res.status(201).json(updatedAppointments); // Return the found appointments
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Route to cancel an appointment
+router.patch("/cancel-appointment/:appointmentId", checkToken, async (req, res) => {
   const appointmentId = req.params.appointmentId;
   const user_id = req.body.user_id; 
 
@@ -283,9 +238,9 @@ router.patch("/cancel-appointment/:appointmentId",checkToken, async (req, res) =
       return res.status(404).json({ msg: "User not found" });
     }
 
-    // Verifique se o compromisso existe
+    // Check if the appointment exists
     const appointment = await Appointment.findById(appointmentId);
-  if (!appointment) {
+    if (!appointment) {
       return res.status(404).json({ msg: "Appointment not found" });
     }
 
@@ -293,15 +248,14 @@ router.patch("/cancel-appointment/:appointmentId",checkToken, async (req, res) =
       return res.status(403).json({ msg: "Appointment has already been canceled" });
     }
   
-    // Verifique se o usuário é o proprietário do compromisso ou é um administrador
+    // Check if the user is the owner of the appointment or is an admin
     if (
       appointment.user_obj.equals(user._id) || user.user_type ==="admin"
     ) {
-      // Atualize o status para "canceled" e registre quem cancelou
+      // Update status to "canceled" and record who canceled
       appointment.status = "canceled";
       appointment.canceled_by = `${user.first_name} ${user.last_name}`;
       await appointment.save();
-
 
       res.status(200).send(appointment);
     } else {

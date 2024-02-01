@@ -1,35 +1,40 @@
 import mongoose from "mongoose";
 
-
+// Define the schema for tasks
 const taskSchema = new mongoose.Schema(
   {
-    task_name: { type: String },
-    notes: { type: String },
+    // Name of the task
+    task_name: { type: String }, 
+    // Additional notes for the task
+    notes: { type: String }, 
+    // Priority level of the task
     priority: {
       type: String,
-      enum: ["low", "medium", "high"],
-      default: "medium",
+      enum: ["low", "medium", "high"], 
+      default: "medium", // Default priority is set to medium
     },
     status: {
       type: String,
-      enum: ["to_do", "in_progress", "completed", "delayed"],
-      default: "to_do",
+      enum: ["to_do", "in_progress", "completed", "delayed"], // Status of the task
+      default: "to_do", // Default status is set to "to_do"
     },
-    completionDate: { type: Date },
+    completionDate: { type: Date }, // Date when the task is completed
   },
   {
     comments: [
       {
-        author: String, // Nome ou identificador do autor do comentário
-        content: String, // Conteúdo do comentário
-        timestamp: Date, // Marca de tempo do comentário
+        author: String, // Name or identifier of the comment author
+        content: String, // Content of the comment
+        timestamp: Date, // Timestamp of the comment
       },
     ],
-    timestamps: true,
+    // Automatically adds createdAt and updatedAt fields
+    timestamps: true, 
   }
 );
 
-// Therapy Task Model
+// Define the Task model based on the taskSchema
 const Task = mongoose.model("Task", taskSchema);
 
-module.exports = Task;
+// Export the Task model
+export default Task;

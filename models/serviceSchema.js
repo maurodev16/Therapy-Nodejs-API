@@ -1,11 +1,13 @@
 import mongoose from "mongoose";
-// Therapy Service type Schema
+
+// Define the schema for therapy service types
 const serviceSchema = new mongoose.Schema({
-  name: { type: String },
-  notes: { type: String },
+  name: { type: String }, // Name of the therapy service type
+  notes: { type: String }, // Additional notes for the service type
 });
 
-// Therapy Service Type Model
+// Define the ServiceType model based on the serviceSchema
 const ServiceType = mongoose.model("ServiceType", serviceSchema);
 
-export default  ServiceType ;
+// Export the ServiceType model
+export default ServiceType;

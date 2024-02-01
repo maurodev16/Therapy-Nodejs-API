@@ -3,57 +3,56 @@ import express from "express";
 import User from "../models/userSchema.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import crypto from "crypto";
-import mongoose from "mongoose";
 
 dotenv.config();
 const router = express.Router();
 
-const BCRYPT_SALT = process.env.BCRYPT_SALT;
-const AUTH_SECRET_KEY = process.env.AUTH_SECRET_KEY;
+const BCRYPT_SALT = process.env.BCRYPT_SALT; // Salt value for bcrypt hashing
+const AUTH_SECRET_KEY = process.env.AUTH_SECRET_KEY; // Secret key for JWT token
 
 /// Login route
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    // Validate User data
-    if (!email) {
-      console.log(email);
 
+    // Validate user data
+    if (!email) {
       return res.status(422).send("Please provide a valid email!");
     }
 
     let user;
 
-    // Check if Email is an email using regular expression
+    // Check if the provided email is in valid format
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
+    // Find user by email
     if (isEmail) {
       user = await User.findOne({ email: email });
-      console.log(email);
     } else {
-      // Find user using email
+      // If email is not in valid format, try to find user by partial email match
       user = await User.findOne({
         email: { $regex: `^${email}`, $options: "i" },
       });
-      console.log(user);
     }
 
+    // If no user found with the provided email
     if (!user) {
-      return res.status(404).send("No User found with this email!");
+      return res.status(404).send("No user found with this email!");
     }
 
+    // Validate password presence
     if (!password) {
       return res.status(422).json("Password is required!");
     }
-    // Verify password
+
+    // Verify if the provided password matches the hashed password stored in the database
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       return res.status(422).json("Incorrect password");
     }
 
-    // Generate token
+    // Generate JWT token
     const token = jwt.sign(
       {
         _id: user._id,
@@ -62,12 +61,11 @@ router.post("/login", async (req, res) => {
       },
       AUTH_SECRET_KEY,
       {
-        //  expiresIn: "1h", // Token expiration time
+         expiresIn: "1h", // Token expiration time (if needed)
       }
     );
 
-    // Return the authentication token and user information
-
+    // Return user information and authentication token
     return res.status(200).json({
       _id: user._id,
       client_number: user.client_number,
@@ -80,8 +78,8 @@ router.post("/login", async (req, res) => {
       token,
     });
   } catch (error) {
-    console.log(error);
-    console.log(error)
+    // Handle any errors that occur during login process
+    console.error(error);
     return res.status(500).send("An error occurred during login.");
   }
 });

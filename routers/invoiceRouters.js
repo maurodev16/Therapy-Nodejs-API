@@ -7,12 +7,12 @@ import Appointment from "../models/appointmentSchema.js";
 import uploadSingleInvoice from "../middleware/multerSingleInvoiceMiddleware.js";
 import checkToken from "../middleware/checkToken.js";
 
-//HELPER FUNCTION TO UPDATE INVOICE STATUS
+// Helper function to update invoice status
 async function updateInvoiceStatus(invoiceId, newStatus) {
   await Invoice.updateOne({ _id: invoiceId }, { $set: { status: newStatus } });
 }
 
-// Rota para criar uma nova fatura
+// Route to create a new invoice
 router.post(
   "/create-invoice",
   checkToken,
@@ -21,7 +21,7 @@ router.post(
     try {
       const invoiceData = await req.body;
 
-      // Verifica se o usuário existe
+      // Check if the user exists
       const user = await User.findById(invoiceData.user_obj).select(
         "-password"
       );
@@ -29,15 +29,14 @@ router.post(
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Verificar se o usuário atual é um admin
-      console.log(user.user_type);
+      // Check if the current user is an admin
       if (user.user_type !== "admin") {
         return res
           .status(403)
           .send("Permission denied. Only admins can create invoices.");
       }
 
-      // Verifica se o Appointment existe
+      // Check if the appointment exists
       const appointment = await Appointment.findById(
         invoiceData.appointment_obj
       );
@@ -46,14 +45,14 @@ router.post(
         return res.status(400).json({ error: "Appointment not found" });
       }
 
-      // Verificar se foram enviadas fotos para a galeria
+      // Check if photos for the gallery have been sent
       if (!req.file || req.file.length === 0) {
         return res.status(400).send("No file provided");
       }
 
       const file = req.file;
       const invoice_name = `${file.originalname.split(".")[0]}`;
-      console.log(file);
+
       const result = await cloudinary.uploader.upload(file.path, {
         resource_type: "raw",
         allowedFormats: ["jpg", "png", "pdf"],
@@ -66,7 +65,7 @@ router.post(
         return res.status(500).send("Error uploading Invoice to cloudinary");
       }
 
-      // Cria a fatura no schema Invoice
+      // Create the invoice in the Invoice schema
       const invoice = new Invoice({
         invoice_url: result.secure_url,
         invoice_name: invoice_name,
@@ -77,22 +76,22 @@ router.post(
         status: invoiceData.status,
       });
 
-      // Verifique se appointment.invoice_obj é null ou undefined
+      // Check if appointment.invoice_obj is null or undefined
       if (!appointment.invoice_obj) {
-        // Se for null ou undefined, inicialize como um array vazio
+        // If it is null or undefined, initialize as an empty array
         appointment.invoice_obj = [];
       }
 
-      // Agora você pode chamar push com segurança
+      // Now you can safely call push
       appointment.invoice_obj.push(invoice._id);
 
-      // Atualize a quantidade de faturas
+      // Update the number of invoices
       appointment.invoice_qnt = appointment.invoice_obj.length;
 
-      // Salve as alterações no appointment
+      // Save the changes to the appointment
       await appointment.save();
 
-      // Salve a fatura no banco de dados
+      // Save the invoice in the database
       await invoice.save();
 
       res.status(200).json(invoice);
@@ -103,8 +102,8 @@ router.post(
   }
 );
 
-// Rota para obter e atualizar o status das faturas com base nas datas
-router.get("/fetch-invoices",checkToken, async (req, res) => {
+// Route to get and update invoice status based on dates
+router.get("/fetch-invoices", checkToken, async (req, res) => {
   try {
     const currentDate = Date.now();
     const invoices = await Invoice.find({})
@@ -116,29 +115,13 @@ router.get("/fetch-invoices",checkToken, async (req, res) => {
     for (const invoice of invoices) {
       switch (invoice.status) {
         case "open":
-          if (invoice.over_duo < currentDate && invoice.status =="open") {
+          if (invoice.over_duo < currentDate && invoice.status == "open") {
             await updateInvoiceStatus(invoice._id, "overduo");
           }
           break;
 
-        // case "paid":
-        //   if (invoice.over_duo < currentDate && invoice.status =="open") {
-        //     await updateInvoiceStatus(invoice._id, "paid");
-        //   } else {
-        //     await updateInvoiceStatus(invoice._id, "paid");
-        //   }
-        //   break;
-
-        // case "refunded":
-        //   if (invoice.over_duo < currentDate) {
-        //     await updateInvoiceStatus(invoice._id, "refunded");
-        //   } else {
-        //     await updateInvoiceStatus(invoice._id, "refunded");
-        //   }
-        //   break;
-
         default:
-          // Lógica para lidar com outros status, se necessário
+          // Logic to handle other statuses, if needed
       }
     }
 
@@ -154,9 +137,7 @@ router.get("/fetch-invoices",checkToken, async (req, res) => {
   }
 });
 
-
-
-// Fetch Invoices by user Id
+// Route to fetch invoices by user Id
 router.get("/fetch-invoices-by-user-id/:user_id", async (req, res) => {
   try {
     const currentDate = Date.now();
@@ -170,33 +151,17 @@ router.get("/fetch-invoices-by-user-id/:user_id", async (req, res) => {
     for (const invoice of invoices) {
       switch (invoice.status) {
         case "open":
-          if (invoice.over_duo < currentDate && invoice.status =="open") {
+          if (invoice.over_duo < currentDate && invoice.status == "open") {
             await updateInvoiceStatus(invoice._id, "overduo");
           }
           break;
 
-        // case "paid":
-        //   if (invoice.over_duo < currentDate && invoice.status =="open") {
-        //     await updateInvoiceStatus(invoice._id, "paid");
-        //   } else {
-        //     await updateInvoiceStatus(invoice._id, "paid");
-        //   }
-        //   break;
-
-        // case "refunded":
-        //   if (invoice.over_duo < currentDate) {
-        //     await updateInvoiceStatus(invoice._id, "refunded");
-        //   } else {
-        //     await updateInvoiceStatus(invoice._id, "refunded");
-        //   }
-        //   break;
-
         default:
-          // Lógica para lidar com outros status, se necessário
+          // Logic to handle other statuses, if needed
       }
     }
 
-    const updatedInvoices = await Invoice.find({user: userId})
+    const updatedInvoices = await Invoice.find({ user: userId })
       .sort({ over_due: 1 })
       .select("-__v")
       .populate("user_obj", "client_number first_name last_name email phone")
@@ -208,45 +173,29 @@ router.get("/fetch-invoices-by-user-id/:user_id", async (req, res) => {
   }
 });
 
-// Rota para atualizar o status das faturas com base nas datas
+// Route to update invoice status based on dates
 router.put("/update-invoice-status", async (req, res) => {
   try {
-    const currentDate =  Date.now();
+    const currentDate = Date.now();
 
-    // Encontre todas as faturas
+    // Find all invoices
     const invoices = await Invoice.find({}).sort({ over_due: 1 });
 
-    // Atualize o status para "overduo" se a fatura estiver vencida e com o status OPEN
+    // Update status to "overduo" if the invoice is overdue and with status OPEN
     for (const invoice of invoices) {
       switch (invoice.status) {
         case "open":
-          if (invoice.over_duo < currentDate && invoice.status =="open") {
+          if (invoice.over_duo < currentDate && invoice.status == "open") {
             await updateInvoiceStatus(invoice._id, "overduo");
           }
           break;
 
-        // case "paid":
-        //   if (invoice.over_duo < currentDate && invoice.status =="open") {
-        //     await updateInvoiceStatus(invoice._id, "paid");
-        //   } else {
-        //     await updateInvoiceStatus(invoice._id, "paid");
-        //   }
-        //   break;
-
-        // case "refunded":
-        //   if (invoice.over_duo < currentDate) {
-        //     await updateInvoiceStatus(invoice._id, "refunded");
-        //   } else {
-        //     await updateInvoiceStatus(invoice._id, "refunded");
-        //   }
-        //   break;
-
         default:
-          // Lógica para lidar com outros status, se necessário
+          // Logic to handle other statuses, if needed
       }
     }
 
-    // Recupere a lista atualizada de faturas após as atualizações
+    // Retrieve the updated list of invoices after updates
     const updatedInvoices = await Invoice.find({}).sort({ over_due: 1 });
 
     res.status(200).json(updatedInvoices);
