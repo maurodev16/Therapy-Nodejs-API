@@ -55,6 +55,7 @@ router.post(
 
       const result = await cloudinary.uploader.upload(file.path, {
         resource_type: "raw",
+        folder:"invoices",
         allowedFormats: ["jpg", "png", "pdf"],
         public_id: invoice_name,
         overwrite: false,

@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ./index.js localhost 3001"
+    "dev": "nodemon ./index.js localhost 3001",
+    "start": "node ./index.js localhost 3001"
   },
   "repository": {
     "type": "git",
