@@ -1,48 +1,48 @@
-TASKSCHEMA:
-1. **ID da Tarefa:**
-   - Um identificador único para cada tarefa. Pode ser um número, uma string ou qualquer outro tipo de identificador exclusivo.
+TASK SCHEMA:
+1. **Task ID:**
+   - A unique identifier for each task. It can be a number, a string, or any other type of unique identifier.
 
-2. **Nome/Título da Tarefa:**
-   - Uma descrição curta e informativa da tarefa.
+2. **Task Name/Title:**
+   - A short and informative description of the task.
 
-3. **Descrição da Tarefa:**
-   - Uma descrição mais detalhada que fornece informações adicionais sobre a tarefa, se necessário.
+3. **Task Description:**
+   - A more detailed description that provides additional information about the task, if necessary.
 
-4. **Data de Criação:**
-   - A data e hora em que a tarefa foi criada.
+4. **Creation Date:**
+   - The date and time when the task was created.
 
-5. **Data de Vencimento:**
-   - A data e hora em que a tarefa deve ser concluída.
+5. **Due Date:**
+   - The date and time by which the task should be completed.
 
-6. **Prioridade:**
-   - Um indicador de prioridade que ajuda a determinar a importância relativa da tarefa. Pode ser uma escala numérica, como 1 (baixa prioridade) a 5 (alta prioridade).
+6. **Priority:**
+   - An indicator of priority that helps determine the relative importance of the task. It can be a numeric scale, such as 1 (low priority) to 5 (high priority).
 
 7. **Status:**
-   - O estado atual da tarefa (por exemplo, "A fazer", "Em andamento", "Concluída", "Atrasada", etc.).
+   - The current state of the task (e.g., "To-Do", "In Progress", "Completed", "Delayed", etc.).
 
-8. **Responsável:**
-   - A pessoa ou equipe responsável por realizar a tarefa.
+8. **Assignee:**
+   - The person or team responsible for performing the task.
 
-9. **Tags/Categorias:**
-   - Marcadores que ajudam a categorizar ou organizar as tarefas.
+9. **Tags/Categories:**
+   - Labels that help categorize or organize tasks.
 
-10. **Comentários:**
-    - Uma seção para adicionar comentários ou informações adicionais relacionadas à tarefa.
+10. **Comments:**
+    - A section to add comments or additional information related to the task.
 
-11. **Anexos:**
-    - Se necessário, a capacidade de anexar arquivos ou documentos relevantes à tarefa.
+11. **Attachments:**
+    - If necessary, the ability to attach relevant files or documents to the task.
 
-12. **Lembretes:**
-    - Opções para configurar lembretes ou notificações relacionadas à tarefa.
+12. **Reminders:**
+    - Options to set reminders or notifications related to the task.
 
-13. **Progresso:**
-    - Um indicador visual ou numérico que mostra o progresso da tarefa.
+13. **Progress:**
+    - A visual or numeric indicator showing the progress of the task.
 
-14. **Data de Conclusão:**
-    - A data e hora em que a tarefa foi concluída.
+14. **Completion Date:**
+    - The date and time when the task was completed.
 
-15. **Histórico de Atualizações:**
-    - Um registro de alterações ou atualizações feitas na tarefa ao longo do tempo.
+15. **Update History:**
+    - A record of changes or updates made to the task over time.
 
-16. **Notificações:**
-    - Configurações relacionadas a como e quando notificar os responsáveis sobre a tarefa.
+16. **Notifications:**
+    - Settings related to how and when to notify the responsible parties about the task.
