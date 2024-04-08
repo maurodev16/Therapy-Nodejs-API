@@ -52,6 +52,6 @@ Welcome to the Therapy API, a backend solution designed to support therapy-relat
 Contributions to the Therapy API project are welcome! If you'd like to contribute, please follow the guidelines outlined in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Contact
-If you have any questions, suggestions, or feedback, feel free to reach out to us at [your_email@example.com](mailto:mauro.developer.br@gmail.com).
+If you have any questions, suggestions, or feedback, feel free to reach out to us at [mauro.developer.br@gmail.com](mailto:mauro.developer.br@gmail.com).
 
 Thank you for choosing the Therapy API for your therapy-related needs!
