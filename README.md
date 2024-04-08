@@ -1,3 +1,5 @@
+# Mauro Rodrigues - Portfolio
+
 # Therapy API
 
 Welcome to the Therapy API, a backend solution designed to support therapy-related functionalities. This API offers various features to assist therapists and users in managing therapy-related tasks efficiently.
